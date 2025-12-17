@@ -62,7 +62,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private boolean leftPressed = false;
     private boolean rightPressed = false;
     private boolean jumpPressed = false; 
-    private boolean jumpLocked = false;  
+    private boolean jumpLocked = false;
+    
+    // --- Animation Controller ---
+    private AnimationController animationController;  
     
     // --- 게임 상태 ---
     private int maxOxygen = 1000;
@@ -116,6 +119,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         this.cards = cards;
         this.eventPanel = eventPanel;
         this.saveManager = saveManager;
+        
+        // Initialize animation controller
+        animationController = new AnimationController();
 
         menuButton = new JButton("MENU");
         menuButton.setBounds(WINDOW_WIDTH - 100, 20, 80, 40);
@@ -372,8 +378,30 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         // 플레이어
-        g.setColor(Color.BLUE);
-        g.fillRect(playerX, playerY, playerWidth, playerHeight);
+        Image currentFrame = animationController.getCurrentFrame();
+        if (currentFrame != null) {
+            // Draw the character image
+            int imgWidth = playerWidth;
+            int imgHeight = playerHeight;
+            
+            // Handle horizontal flipping for direction
+            if (!animationController.isFacingRight()) {
+                // Flip horizontally for left-facing
+                g.drawImage(currentFrame, 
+                    playerX + imgWidth, playerY, 
+                    playerX, playerY + imgHeight,
+                    0, 0, 
+                    currentFrame.getWidth(null), currentFrame.getHeight(null),
+                    null);
+            } else {
+                // Normal rendering for right-facing
+                g.drawImage(currentFrame, playerX, playerY, imgWidth, imgHeight, null);
+            }
+        } else {
+            // Fallback to blue rectangle if image not loaded
+            g.setColor(Color.BLUE);
+            g.fillRect(playerX, playerY, playerWidth, playerHeight);
+        }
         
         if (mapManager.isUnderwater() && currentOxygen < 300 && (currentOxygen / 20) % 2 == 0) {
              g.setFont(new Font("Arial", Font.BOLD, 40));
@@ -574,12 +602,43 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Update springboards
         mapManager.updateSpringboards();
 
-        checkInteractions(); 
+        checkInteractions();
+        
+        // Update animation state based on player movement
+        updateAnimationState();
+        
+        // Update animation controller
+        animationController.update();
 
         cameraX = playerX - WINDOW_WIDTH / 2;
         if (cameraX < 0) cameraX = 0; 
         if (cameraX > mapManager.getLevelWidth() - WINDOW_WIDTH) 
             cameraX = mapManager.getLevelWidth() - WINDOW_WIDTH;
+    }
+    
+    /**
+     * Updates the character animation state based on player movement and input.
+     */
+    private void updateAnimationState() {
+        // Determine character state based on movement
+        if (!onGround) {
+            // Player is in the air
+            animationController.setState(CharacterState.JUMPING);
+        } else if (leftPressed || rightPressed) {
+            // Player is moving on ground
+            animationController.setState(CharacterState.WALKING);
+        } else {
+            // Player is idle
+            animationController.setState(CharacterState.IDLE);
+        }
+        
+        // Update facing direction based on movement
+        if (leftPressed) {
+            animationController.setFacingRight(false);
+        } else if (rightPressed) {
+            animationController.setFacingRight(true);
+        }
+        // If neither is pressed, keep the current direction
     }
         
     private void handleDeath() {
@@ -746,11 +805,21 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         rightPressed = false;
         jumpPressed = false;
         jumpLocked = false;
+        
+        // Reset animation controller
+        if (animationController != null) {
+            animationController.reset();
+        }
     }
     
     public void changeStage(String stage) {
         this.currentStageName = stage; 
         mapManager.loadLevel(stage);
+        
+        // Update animation controller for stage-specific sprites
+        if (animationController != null) {
+            animationController.setStage(stage);
+        }
         
         // Reset breakable platforms
         mapManager.resetBreakablePlatforms();
@@ -761,12 +830,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // 애니메이션 초기화
         isShowingStageName = true;
         stageNameAnimTimer = 0;
-        
-        currentLives = maxLives; 
-        respawn();
-        isDead = false;
-        isCleared = false; 
-        clearDelayTimer = 0;
         
         currentLives = maxLives; 
         respawn();
