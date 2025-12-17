@@ -1,5 +1,6 @@
 package stage;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import data.SaveManager;
@@ -8,6 +9,8 @@ import ui.eventScenePanel;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -32,6 +35,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private JButton btnRestart, btnStageSelect, btnExitTitle, btnResume;
     private ImageIcon charIcon;
     private Image charIconScaled;
+    private Image rivalImage;
     
     private boolean isStoryMode = false;
     
@@ -118,6 +122,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             charIconScaled = charIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         } catch (Exception e) {
             System.out.println("이미지 로드 실패: " + e.getMessage());
+        }
+        try {
+            rivalImage = ImageIO.read(new File("src/stage/images/char_ski_anti.png"));
+        } catch (IOException e) {
+            System.err.println("Failed to load rival image: " + e.getMessage());
         }
 
         mapManager = new MapManager();
@@ -422,16 +431,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             int rivalWidth = rivalCharacter.getWidth();
             int rivalHeight = rivalCharacter.getHeight();
             
-            // 라이벌을 빨간색 사각형으로 렌더링 (플레이어와 구분)
-            g.setColor(new Color(200, 0, 0)); // 어두운 빨간색
-            g.fillRect(rivalX, rivalY, rivalWidth, rivalHeight);
-            g.setColor(Color.BLACK);
-            g.drawRect(rivalX, rivalY, rivalWidth, rivalHeight);
-            
-            // 라이벌 위에 "RIVAL" 텍스트 표시
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.BOLD, 12));
-            g.drawString("RIVAL", rivalX, rivalY - 5);
+            if (rivalImage != null) {
+            	g.drawImage(rivalImage, rivalX, rivalY, rivalWidth, rivalHeight, null);
+            } else {
+                // 이미지 로드 실패 시 기존 사각형 렌더링
+                g.setColor(new Color(200, 0, 0));
+                g.fillRect(rivalX, rivalY, rivalWidth, rivalHeight);
+            }
         }
     }
 

@@ -20,7 +20,7 @@ public class RivalCharacter {
     private boolean onGround;
     
     // AI parameters
-    private final double moveSpeed = 10.0; // Slightly slower than player's 15.0
+    private final double moveSpeed = 14.0; // Slightly slower than player's 15.0
     private final int detectionRange = 150; // Pixels ahead to detect obstacles
     private final int detectionHeight = 100; // Height to check for obstacles
     private final int groundCheckDistance = 50; // Distance ahead to check for ground
