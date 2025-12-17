@@ -63,7 +63,7 @@ public class MapManager {
             fileName = "stage3.txt";
         } else if (stageName.equals("Deep Water")) {
             fileName = "stage4.txt";
-        } else if (stageName.equals("스테이지 5")) {
+        } else if (stageName.equals("Labyrinth")) {
             fileName = "stage5.txt";
         } else if (stageName.equals("스테이지 6")) {
             fileName = "stage6.txt";

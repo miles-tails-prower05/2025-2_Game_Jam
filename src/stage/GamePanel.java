@@ -494,8 +494,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     } else if ("Shattered Wreckage".equals(currentStageName)) {
                         changeStage("Deep Water");
                     } else if ("Deep Water".equals(currentStageName)) {
-                        changeStage("스테이지 5");
-                    } else if ("스테이지 5".equals(currentStageName)) {
+                        changeStage("Labyrinth");
+                    } else if ("Labyrinth".equals(currentStageName)) {
                         changeStage("스테이지 6");
                     } else if ("스테이지 6".equals(currentStageName)) {
                         changeStage("스테이지 7");
@@ -519,7 +519,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
 
             bubbleSpawnTimer++;
-            if (bubbleSpawnTimer > 100) {
+            if (bubbleSpawnTimer > 60) {
                 int[] spawners = mapManager.getBubbleSpawnersX();
                 if (spawners != null && spawners.length > 0) {
                     int randomSpawnerIndex = new Random().nextInt(spawners.length);
