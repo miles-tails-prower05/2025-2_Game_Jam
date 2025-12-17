@@ -580,6 +580,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         // Reset breakable platforms on respawn
         mapManager.resetBreakablePlatforms();
+        
+        // Reset springboards on respawn
+        mapManager.resetSpringboards();
     }
 
     private void checkCollisionX() {
@@ -637,6 +640,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     velocityY = -sb.getPropelHeight(); // Apply upward velocity based on propel height
                     onGround = false; // Player is launched, not on ground
                     sb.trigger(); // Trigger compression animation
+                } else if (velocityY < 0) {
+                    playerY = springboard.y + springboard.height;
+                    velocityY = 0;
                 }
             }
         }
@@ -710,6 +716,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Reset breakable platforms
         mapManager.resetBreakablePlatforms();
         
+        // Reset springboards
+        mapManager.resetSpringboards();
+        
         if (activeBubbles != null) activeBubbles.clear();
         
         leftPressed = false;
@@ -724,6 +733,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         // Reset breakable platforms
         mapManager.resetBreakablePlatforms();
+        
+        // Reset springboards
+        mapManager.resetSpringboards();
         
         // 애니메이션 초기화
         isShowingStageName = true;

@@ -42,6 +42,14 @@ public class Springboard {
         }
     }
     
+    /**
+     * Resets the springboard to its initial state
+     */
+    public void reset() {
+        isCompressed = false;
+        compressionTimer = 0;
+    }
+    
     // Getters
     public Rectangle getBounds() {
         return bounds;

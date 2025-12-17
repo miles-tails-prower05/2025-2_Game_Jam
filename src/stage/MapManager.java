@@ -230,4 +230,13 @@ public class MapManager {
             sb.update();
         }
     }
+    
+    /**
+     * Resets all springboards to their initial state
+     */
+    public void resetSpringboards() {
+        for (Springboard sb : springboards) {
+            sb.reset();
+        }
+    }
 }
