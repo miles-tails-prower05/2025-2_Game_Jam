@@ -119,7 +119,7 @@ public class StageFeatureTest {
             System.out.println("Stage 7: Remote Island (Ground) - Final exploration stage");
         } else {
             System.out.println("✗ Some stage features failed validation");
-            System.exit(1);
+            throw new RuntimeException("Stage feature validation failed: " + (totalTests - passedTests) + " failures");
         }
     }
 }

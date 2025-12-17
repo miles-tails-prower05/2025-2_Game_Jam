@@ -53,7 +53,7 @@ public class StageLoadTest {
             System.out.println("✓ All stages loaded successfully!");
         } else {
             System.out.println("✗ Some stages failed to load");
-            System.exit(1);
+            throw new RuntimeException("Stage loading tests failed: " + (totalTests - passedTests) + " failures");
         }
     }
 }
