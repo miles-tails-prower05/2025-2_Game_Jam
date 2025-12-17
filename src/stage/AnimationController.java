@@ -2,15 +2,19 @@ package stage;
 
 import javax.swing.ImageIcon;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 
 /**
  * Manages character animations and state transitions.
  * Handles loading images, frame timing, and providing the current frame.
  */
 public class AnimationController {
+    // Image path constants
+    private static final String IMAGE_BASE_PATH = "src/stage/images/";
+    private static final String IDLE_IMAGE = IMAGE_BASE_PATH + "char_idle.png";
+    private static final String JUMP_IMAGE = IMAGE_BASE_PATH + "char_jump.png";
+    private static final String WALK_IMAGE_PREFIX = IMAGE_BASE_PATH + "char_walk_0";
+    private static final String WALK_IMAGE_SUFFIX = ".png";
+    
     // Character state
     private CharacterState currentState;
     private boolean facingRight; // true = right, false = left
@@ -42,25 +46,57 @@ public class AnimationController {
      * Loads all character images from the images directory.
      */
     private void loadImages() {
+        boolean allLoaded = true;
+        
         try {
             // Load idle image
-            ImageIcon idleIcon = new ImageIcon("src/stage/images/char_idle.png");
-            idleImage = idleIcon.getImage();
-            
-            // Load jump image
-            ImageIcon jumpIcon = new ImageIcon("src/stage/images/char_jump.png");
-            jumpImage = jumpIcon.getImage();
-            
-            // Load walk images
-            for (int i = 0; i < 4; i++) {
-                ImageIcon walkIcon = new ImageIcon("src/stage/images/char_walk_0" + (i + 1) + ".png");
-                walkImages[i] = walkIcon.getImage();
+            ImageIcon idleIcon = new ImageIcon(IDLE_IMAGE);
+            if (idleIcon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                idleImage = idleIcon.getImage();
+            } else {
+                System.err.println("Warning: Failed to load idle image from " + IDLE_IMAGE);
+                allLoaded = false;
             }
-            
-            System.out.println("Character images loaded successfully");
         } catch (Exception e) {
-            System.err.println("Failed to load character images: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error loading idle image: " + e.getMessage());
+            allLoaded = false;
+        }
+        
+        try {
+            // Load jump image
+            ImageIcon jumpIcon = new ImageIcon(JUMP_IMAGE);
+            if (jumpIcon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                jumpImage = jumpIcon.getImage();
+            } else {
+                System.err.println("Warning: Failed to load jump image from " + JUMP_IMAGE);
+                allLoaded = false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading jump image: " + e.getMessage());
+            allLoaded = false;
+        }
+        
+        // Load walk images
+        for (int i = 0; i < 4; i++) {
+            try {
+                String walkPath = WALK_IMAGE_PREFIX + (i + 1) + WALK_IMAGE_SUFFIX;
+                ImageIcon walkIcon = new ImageIcon(walkPath);
+                if (walkIcon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                    walkImages[i] = walkIcon.getImage();
+                } else {
+                    System.err.println("Warning: Failed to load walk image " + (i + 1) + " from " + walkPath);
+                    allLoaded = false;
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading walk image " + (i + 1) + ": " + e.getMessage());
+                allLoaded = false;
+            }
+        }
+        
+        if (allLoaded) {
+            System.out.println("Character images loaded successfully");
+        } else {
+            System.err.println("Warning: Some character images failed to load. Game may use fallback rendering.");
         }
     }
     

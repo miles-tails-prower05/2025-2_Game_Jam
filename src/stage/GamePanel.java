@@ -64,7 +64,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private boolean jumpPressed = false; 
     private boolean jumpLocked = false;
     
-    // --- 애니메이션 컨트롤러 ---
+    // --- Animation Controller ---
     private AnimationController animationController;  
     
     // --- 게임 상태 ---
@@ -120,7 +120,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         this.eventPanel = eventPanel;
         this.saveManager = saveManager;
         
-        // 애니메이션 컨트롤러 초기화
+        // Initialize animation controller
         animationController = new AnimationController();
 
         menuButton = new JButton("MENU");
