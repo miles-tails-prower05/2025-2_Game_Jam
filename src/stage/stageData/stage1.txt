@@ -21,6 +21,12 @@ friction=0.95
 1500, 400, 80, 20
 2300, 450, 200, 20
 
+[BREAKABLE_PLATFORMS]
+# x, y, width, height
+600, 250, 80, 20
+1300, 350, 100, 20
+2000, 400, 80, 20
+
 [SPIKES]
 # x, y, width, height
 300, 520, 100, 30
