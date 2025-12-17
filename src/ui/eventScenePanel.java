@@ -202,7 +202,7 @@ public class eventScenePanel extends JPanel {
         
         // 이미지 파일 경로: src/images 폴더 안에 있다고 가정 (필요시 경로 수정)
         // 예: /images/bg_01.png
-        java.net.URL imgUrl = getClass().getResource("/images/" + imageName);
+        java.net.URL imgUrl = getClass().getResource("/ui/images/" + imageName);
         if (imgUrl != null) {
             ImageIcon icon = new ImageIcon(imgUrl);
             // 라벨 크기에 맞게 이미지 리사이징

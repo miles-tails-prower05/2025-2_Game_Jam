@@ -1,4 +1,13 @@
-# 인트로 스크립트 예제
-scene_bg_01.png|face_hero.png|주인공|여기가 어디지...? 어두워서 아무것도 안 보여.
-scene_bg_01.png|face_unknown.png|???|거기 누구냐!
-scene_bg_02.png|face_hero.png|주인공|누구세요? 모습을 드러내세요!
+# 인트로 스크립트
+scene_bg_01.png|face_antiPlayer.png||마침내... 만물의 에너지가 이 안에 응축되었다.
+scene_bg_01.png|face_antiPlayer.png||누구도 도달하지 못한 신의 영역, 얼티밋 쉘이 완성됐어.
+scene_bg_01.png|face_antiPlayer.png||이것만 있으면 우리 세계를 되살릴 수 있다!
+scene_bg_02.png|face_unknown.png|???|멈춰!
+scene_bg_02.png|face_unknown.png|???|그건 다른 이의 희생을 불러올 뿐이다!!
+scene_bg_03.png|face_unknown.png|???|우리가 불러온 재앙을 죄없는 이의 희생으로 만회할 셈인가!
+scene_bg_03.png|face_antiPlayer.png||방법이 없다고 했잖아! 비켜!
+scene_bg_03.png|face_antiPlayer.png||이 기회를 놓치면 우리는 오늘로 끝이란 말이다!
+scene_bg_04.png|face_unknown.png|???|네 뜻대로 될 수 없다!
+scene_bg_05.png|face_unknown.png|???|...
+scene_bg_06.png|face_unknown.png|???|쿨럭... 안 돼, 힘이... 이동의 충격을 견디지 못하고 흩어지고 있어...
+scene_bg_07.png|face_player.png||당신은 누구죠? 방금 하늘에서 떨어진 물체는 뭐고...
