@@ -837,12 +837,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         isCleared = false; 
         clearDelayTimer = 0;
         
-        currentLives = maxLives; 
-        respawn();
-        isDead = false;
-        isCleared = false; 
-        clearDelayTimer = 0;
-        
         if (activeBubbles != null) activeBubbles.clear();
 
         if (mapManager.isUnderwater()) setBackground(new Color(0, 100, 0)); 

@@ -211,6 +211,9 @@ public class AnimationController {
      * @return The Image to display for the current state and frame
      */
     public Image getCurrentFrame() {
+        // Ensure currentWalkFrame is within bounds
+        int safeWalkFrame = Math.max(0, Math.min(currentWalkFrame, 3));
+        
         // Use water skiing sprites if enabled and available
         if (useWaterSkiingSprites) {
             switch (currentState) {
@@ -220,10 +223,10 @@ public class AnimationController {
                     // Use skiing idle for jumping in water skiing mode
                     return (skiIdleImage != null) ? skiIdleImage : jumpImage;
                 case WALKING:
-                    if (skiMoveImages[currentWalkFrame] != null) {
-                        return skiMoveImages[currentWalkFrame];
+                    if (skiMoveImages[safeWalkFrame] != null) {
+                        return skiMoveImages[safeWalkFrame];
                     }
-                    return (walkImages[currentWalkFrame] != null) ? walkImages[currentWalkFrame] : idleImage;
+                    return (walkImages[safeWalkFrame] != null) ? walkImages[safeWalkFrame] : idleImage;
                 default:
                     return (skiIdleImage != null) ? skiIdleImage : idleImage;
             }
@@ -236,7 +239,7 @@ public class AnimationController {
             case JUMPING:
                 return jumpImage;
             case WALKING:
-                return walkImages[currentWalkFrame];
+                return walkImages[safeWalkFrame];
             default:
                 return idleImage;
         }
