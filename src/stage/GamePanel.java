@@ -9,7 +9,19 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
+    // --- 카드 레이아웃 관련 ---
+	private Container frame;
+	private CardLayout cards;
+	private String panel;
+	
+	// --- UI 컴포넌트 ---
+    private JButton menuButton;
+    private JPanel pausePanel;
+    private JButton btnRestart, btnStageSelect, btnExitTitle, btnResume;
     
+    // --- 게임 모드 플래그 ---
+    private boolean isStoryMode = false;
+	
     // --- 설정 변수 ---
     private Timer timer;
     private final int DELAY = 16;
@@ -62,20 +74,130 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         public Rectangle getBounds() { return new Rectangle(x, y, size, size); }
     }
 
-    public GamePanel() {
+    public GamePanel(Container frame, CardLayout cards, String panel) {
+        // [레이아웃 변경] 절대 위치 배치를 위해 null 레이아웃 사용
+        setLayout(null);
+        
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         setBackground(new Color(0, 100, 0)); 
         setFocusable(true);
         addKeyListener(this);
 
         mapManager = new MapManager();
-        
-        // 초기 스테이지 설정 (1: 수중)
-        changeStage(2);
+        this.frame = frame;
+        this.cards = cards;
+        this.panel = panel;
 
+        // --- 1. 메뉴 버튼 생성 (우측 상단) ---
+        menuButton = new JButton("MENU");
+        menuButton.setBounds(WINDOW_WIDTH - 100, 20, 80, 40);
+        menuButton.setFocusable(false); // 키보드 포커스 뺏기지 않도록 설정
+        menuButton.addActionListener(e -> showPauseMenu());
+        add(menuButton);
+
+        // --- 2. 일시정지 패널(팝업) 생성 ---
+        initPausePanel();
+
+        // 초기 설정
+        changeStage(this.panel);
         activeBubbles = new ArrayList<>();
+        
         timer = new Timer(DELAY, this);
         timer.start();
+
+        // (기존 리스너 유지: 화면 전환 시 타이머 관리)
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                if (timer != null && !timer.isRunning()) timer.start();
+                pausePanel.setVisible(false); // 화면 돌아오면 메뉴 닫기
+                menuButton.setVisible(true);
+            }
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                if (timer != null) timer.stop();
+            }
+        });
+    }
+    
+    // 일시정지 메뉴 UI 초기화
+    private void initPausePanel() {
+        pausePanel = new JPanel();
+        pausePanel.setBounds(WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2 - 150, 300, 300);
+        pausePanel.setBackground(new Color(0, 0, 0, 200)); // 반투명 검정 배경
+        pausePanel.setLayout(new GridLayout(4, 1, 10, 10)); // 4개의 버튼 세로 나열
+        pausePanel.setVisible(false); // 처음엔 숨김
+
+        // 버튼 스타일
+        Font font = new Font("Malgun Gothic", Font.BOLD, 18);
+
+        // 1) 게임 계속하기 (편의상 추가)
+        btnResume = new JButton("계속하기");
+        btnResume.setFont(font);
+        btnResume.setFocusable(false);
+        btnResume.addActionListener(e -> resumeGame());
+
+        // 2) 재시작
+        btnRestart = new JButton("스테이지 재시작");
+        btnRestart.setFont(font);
+        btnRestart.setFocusable(false);
+        btnRestart.addActionListener(e -> {
+            resumeGame(); // 패널 닫기
+            resetGame();  // 게임 리셋
+        });
+
+        // 3) 스테이지 선택 (스토리 모드일 때만 비활성화)
+        btnStageSelect = new JButton("스테이지 선택");
+        btnStageSelect.setFont(font);
+        btnStageSelect.setFocusable(false);
+        btnStageSelect.setEnabled(false); // 기본 비활성화
+        btnStageSelect.addActionListener(e -> {
+            cards.show(frame, "SELECT");
+        });
+
+        // 4) 타이틀로 나가기
+        btnExitTitle = new JButton("타이틀로 나가기");
+        btnExitTitle.setFont(font);
+        btnExitTitle.setFocusable(false);
+        btnExitTitle.addActionListener(e -> {
+            cards.show(frame, "TITLE");
+        });
+
+        pausePanel.add(btnResume);
+        pausePanel.add(btnRestart);
+        pausePanel.add(btnStageSelect);
+        pausePanel.add(btnExitTitle);
+
+        add(pausePanel);
+    }
+
+ // 메뉴 열기
+    private void showPauseMenu() {
+        if (timer.isRunning()) {
+            timer.stop(); // 게임 일시정지
+        }
+        
+        // [수정] 스토리 모드가 '아닐 때'만 스테이지 선택 가능
+        // (스토리 모드는 순서대로 진행해야 하므로 선택 불가)
+        btnStageSelect.setEnabled(!isStoryMode);
+        
+        menuButton.setVisible(false); // 메뉴 버튼 숨김
+        pausePanel.setVisible(true);  // 일시정지 창 표시
+    }
+
+    // 메뉴 닫기 (게임 재개)
+    private void resumeGame() {
+        pausePanel.setVisible(false);
+        menuButton.setVisible(true);
+        if (!timer.isRunning()) {
+            timer.start();
+        }
+        this.requestFocus(); // 키보드 제어권을 다시 가져옴 (중요)
+    }
+
+    // 모드 설정 (외부에서 호출)
+    public void setStoryMode(boolean isStoryMode) {
+        this.isStoryMode = isStoryMode;
     }
 
     @Override
@@ -289,9 +411,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (isDead) resetGame();
             else jumpPressed = true;
         }
-        
-        if (key == KeyEvent.VK_1) changeStage(1);
-        if (key == KeyEvent.VK_2) changeStage(2);
     }
 
     @Override
@@ -325,7 +444,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         jumpLocked = false;
     }
     
-    private void changeStage(int stage) {
+    public void changeStage(String stage) {
         mapManager.loadLevel(stage);
         
         // 스테이지 바뀔 때 리셋

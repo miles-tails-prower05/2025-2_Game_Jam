@@ -24,14 +24,14 @@ public class MapManager {
         spikes = new ArrayList<>();
     }
 
-    public void loadLevel(int stage) {
+    public void loadLevel(String stage) {
         platforms.clear();
         spikes.clear();
         
         // 스테이지별 분기
-        if (stage == 1) {
+        if (stage == "스테이지 1") {
             initStage1_Labyrinth(); // 수중 스테이지
-        } else if (stage == 2) {
+        } else if (stage == "스테이지 2") {
             initStage2_GreenHill(); // 지상 스테이지 (예시)
         }
     }
