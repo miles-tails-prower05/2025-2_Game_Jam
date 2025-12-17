@@ -252,6 +252,42 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 g.setColor(new Color(180, 100, 50)); 
             }
         }
+        
+        // 부서지는 플랫폼
+        for (BreakablePlatform bp : mapManager.getBreakablePlatforms()) {
+            Rectangle platform = bp.getBounds();
+            if (platform.x + platform.width > cameraX && platform.x < cameraX + WINDOW_WIDTH) {
+                if (!bp.isBroken()) {
+                    // Calculate shake effect when triggered
+                    int shakeOffset = 0;
+                    if (bp.isTriggered()) {
+                        // Shake more as it gets closer to breaking
+                        int intensity = (bp.getBreakTimer() * 2) / bp.getBreakDelay();
+                        shakeOffset = (bp.getBreakTimer() % 4 < 2) ? intensity : -intensity;
+                    }
+                    
+                    // Draw platform with different color to indicate it's breakable
+                    g.setColor(new Color(150, 80, 40)); // Darker brown
+                    g.fillRect(platform.x, platform.y + shakeOffset, platform.width, platform.height);
+                    
+                    // Draw cracks pattern when triggered
+                    if (bp.isTriggered()) {
+                        g.setColor(Color.BLACK);
+                        // Draw cracks that become more visible as timer increases
+                        int alpha = Math.min(255, (bp.getBreakTimer() * 255) / bp.getBreakDelay());
+                        g.setColor(new Color(0, 0, 0, alpha));
+                        int midX = platform.x + platform.width / 2;
+                        int midY = platform.y + platform.height / 2;
+                        g.drawLine(midX, platform.y + shakeOffset, midX - 10, platform.y + platform.height + shakeOffset);
+                        g.drawLine(midX, platform.y + shakeOffset, midX + 10, platform.y + platform.height + shakeOffset);
+                        g.drawLine(platform.x + 10, midY + shakeOffset, platform.x + platform.width - 10, midY + shakeOffset);
+                    }
+                    
+                    g.setColor(Color.BLACK);
+                    g.drawRect(platform.x, platform.y + shakeOffset, platform.width, platform.height);
+                }
+            }
+        }
 
         // 가시
         g.setColor(Color.LIGHT_GRAY);
@@ -471,6 +507,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         velocityY += mapManager.getGravity(); 
         playerY += velocityY;
         checkCollisionY(); 
+        
+        // Update breakable platforms
+        mapManager.updateBreakablePlatforms();
 
         checkInteractions(); 
 
@@ -496,6 +535,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         velocityY = 0;
         cameraX = 0; // 스테이지 시작 시 카메라 위치도 즉시 초기화
         currentOxygen = maxOxygen; 
+        
+        // Reset breakable platforms on respawn
+        mapManager.resetBreakablePlatforms();
     }
 
     private void checkCollisionX() {
@@ -511,6 +553,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     private void checkCollisionY() {
         Rectangle playerRect = new Rectangle(playerX, playerY, playerWidth, playerHeight);
+        
+        // Check regular platforms
         for (Rectangle platform : mapManager.getPlatforms()) {
             if (playerRect.intersects(platform)) {
                 if (velocityY > 0) { 
@@ -523,6 +567,25 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 }
             }
         }
+        
+        // Check breakable platforms
+        for (BreakablePlatform bp : mapManager.getBreakablePlatforms()) {
+            if (!bp.isBroken()) {
+                Rectangle platform = bp.getBounds();
+                if (playerRect.intersects(platform)) {
+                    if (velocityY > 0) { 
+                        playerY = platform.y - playerHeight;
+                        velocityY = 0;
+                        onGround = true;
+                        bp.trigger(); // Trigger the platform to break
+                    } else if (velocityY < 0) { 
+                        playerY = platform.y + platform.height;
+                        velocityY = 0;
+                    }
+                }
+            }
+        }
+        
         if (playerY > WINDOW_HEIGHT) handleDeath(); 
     }
 
@@ -589,6 +652,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         clearDelayTimer = 0;
         currentPlayTime = 0;
         
+        // Reset breakable platforms
+        mapManager.resetBreakablePlatforms();
+        
         if (activeBubbles != null) activeBubbles.clear();
         
         leftPressed = false;
@@ -600,6 +666,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void changeStage(String stage) {
         this.currentStageName = stage; 
         mapManager.loadLevel(stage);
+        
+        // Reset breakable platforms
+        mapManager.resetBreakablePlatforms();
         
         // 애니메이션 초기화
         isShowingStageName = true;

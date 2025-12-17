@@ -11,6 +11,7 @@ public class MapManager {
     // 맵 구조 데이터
     private ArrayList<Rectangle> platforms;
     private ArrayList<Rectangle> spikes;
+    private ArrayList<BreakablePlatform> breakablePlatforms;
     private int[] bubbleSpawnersX;
     private int levelWidth;
     
@@ -32,12 +33,14 @@ public class MapManager {
     public MapManager() {
         platforms = new ArrayList<>();
         spikes = new ArrayList<>();
+        breakablePlatforms = new ArrayList<>();
     }
 
     // 스테이지 이름을 받아 해당 파일을 로드
     public void loadLevel(String stageName) {
         platforms.clear();
         spikes.clear();
+        breakablePlatforms.clear();
         goalObject = null;
         bubbleSpawnersX = new int[0]; // 초기화
 
@@ -91,6 +94,10 @@ public class MapManager {
                         break;
                     case "PLATFORMS":
                         platforms.add(parseRectangle(line));
+                        break;
+                    case "BREAKABLE_PLATFORMS":
+                        Rectangle rect = parseRectangle(line);
+                        breakablePlatforms.add(new BreakablePlatform(rect.x, rect.y, rect.width, rect.height));
                         break;
                     case "SPIKES":
                         spikes.add(parseRectangle(line));
@@ -155,6 +162,7 @@ public class MapManager {
     // --- Getters ---
     public ArrayList<Rectangle> getPlatforms() { return platforms; }
     public ArrayList<Rectangle> getSpikes() { return spikes; }
+    public ArrayList<BreakablePlatform> getBreakablePlatforms() { return breakablePlatforms; }
     public Rectangle getGoalObject() { return goalObject; }
     public int[] getBubbleSpawnersX() { return bubbleSpawnersX; }
     public int getLevelWidth() { return levelWidth; }
@@ -167,4 +175,22 @@ public class MapManager {
     public double getSpeed() { return speed; }
     public double getFriction() { return friction; }
     public boolean isUnderwater() { return isUnderwater; }
+    
+    /**
+     * Updates all breakable platforms
+     */
+    public void updateBreakablePlatforms() {
+        for (BreakablePlatform bp : breakablePlatforms) {
+            bp.update();
+        }
+    }
+    
+    /**
+     * Resets all breakable platforms to their initial state
+     */
+    public void resetBreakablePlatforms() {
+        for (BreakablePlatform bp : breakablePlatforms) {
+            bp.reset();
+        }
+    }
 }
