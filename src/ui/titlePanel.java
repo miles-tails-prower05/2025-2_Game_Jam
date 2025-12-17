@@ -59,7 +59,7 @@ public class titlePanel extends JPanel {
         // '스토리 진행' 클릭 시 -> 컷씬 재생 후 1스테이지 시작
         storyButton.addActionListener(e -> {
         	gamePanel.setStoryMode(true);
-            gamePanel.changeStage("스테이지 1");
+            gamePanel.changeStage("Gold Coast");
             eventPanel.startCutscene("intro_script.txt", "GAME");
             gamePanel.requestFocus(); // 키 입력을 받기 위해 포커스 요청 필수
         });

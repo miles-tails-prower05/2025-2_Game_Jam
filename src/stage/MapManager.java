@@ -50,7 +50,7 @@ public class MapManager {
         String fileName = "";
         
         // 스테이지 이름에 따른 파일명 매핑
-        if (stageName.equals("스테이지 1")) {
+        if (stageName.equals("Gold Coast")) {
             fileName = "stage1.txt";
         } else if (stageName.equals("스테이지 2")) {
             fileName = "stage2.txt";

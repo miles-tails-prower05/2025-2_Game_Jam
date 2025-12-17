@@ -24,7 +24,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     // --- 스테이지 이름 애니메이션 관련 ---
     private boolean isShowingStageName = false;
     private int stageNameAnimTimer = 0;
-    private final int ANIM_DURATION = 90; // 약 1.5초 (60fps 기준)
+    private final int ANIM_DURATION = 80; // 약 1.5초 (60fps 기준)
     
     // --- UI 컴포넌트 ---
     private JButton menuButton;
@@ -428,23 +428,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
 
             // 1. 파란색 장식 띠 (오른쪽에서 왼쪽으로 이동)
-            int barX = WINDOW_WIDTH - (stageNameAnimTimer * 20); 
-            if (stageNameAnimTimer > 30) barX = WINDOW_WIDTH - 600; // 특정 위치에 고정
+            int targetBarX = WINDOW_WIDTH - 600;
+            int barX = Math.max(targetBarX, WINDOW_WIDTH - (stageNameAnimTimer * 80));
             
             g.setColor(new Color(0, 50, 200, alpha));
             g.fillRect(barX, 250, 700, 100);
 
             // 2. 스테이지 이름 텍스트 (왼쪽에서 오른쪽으로 이동)
             int targetTextX = 200;
-            int textX = Math.min(targetTextX, -300 + (stageNameAnimTimer * 15));
+            int textX = Math.min(targetTextX, -300 + (stageNameAnimTimer * 60));
 
             g.setFont(new Font("Malgun Gothic", Font.ITALIC | Font.BOLD, 50));
             g.setColor(new Color(255, 255, 255, alpha));
             g.drawString(currentStageName, textX, 320);
             
             // "ZONE" 텍스트 추가 (소닉 특유의 감성)
-            g.setFont(new Font("Arial", Font.BOLD, 30));
-            g.drawString("ZONE", textX + 250, 320);
+            //g.setFont(new Font("Arial", Font.BOLD, 30));
+            //g.drawString("ZONE", textX + 250, 320);
         }
     }
     
@@ -475,7 +475,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             clearDelayTimer++;
             if (clearDelayTimer > 180) {
                 if (isStoryMode) {
-                    if ("스테이지 1".equals(currentStageName)) {
+                    if ("Gold Coast".equals(currentStageName)) {
                         changeStage("스테이지 2");
                     } else if ("스테이지 2".equals(currentStageName)) {
                         changeStage("스테이지 3");

@@ -57,7 +57,7 @@ public class stageSelectPanel extends JPanel {
         updateButtonText();
 
         // Add action listeners using helper method
-        addStageListener(stage1Btn, "스테이지 1");
+        addStageListener(stage1Btn, "Gold Coast");
         addStageListener(stage2Btn, "스테이지 2");
         addStageListener(stage3Btn, "스테이지 3");
         addStageListener(stage4Btn, "스테이지 4");
@@ -112,7 +112,7 @@ public class stageSelectPanel extends JPanel {
     
     // ★ 추가: 저장된 기록을 불러와 버튼 텍스트 변경
     private void updateButtonText() {
-        long time1 = saveManager.getBestTime("스테이지 1");
+        long time1 = saveManager.getBestTime("Gold Coast");
         long time2 = saveManager.getBestTime("스테이지 2");
         long time3 = saveManager.getBestTime("스테이지 3");
         long time4 = saveManager.getBestTime("스테이지 4");
@@ -120,7 +120,7 @@ public class stageSelectPanel extends JPanel {
         long time6 = saveManager.getBestTime("스테이지 6");
         long time7 = saveManager.getBestTime("스테이지 7");
         
-        stage1Btn.setText(formatButtonText("스테이지 1: 모래사장", time1));
+        stage1Btn.setText(formatButtonText("스테이지 1: Gold Coast", time1));
         stage2Btn.setText(formatButtonText("스테이지 2: 얕은 바다", time2));
         stage3Btn.setText(formatButtonText("스테이지 3: 난파선", time3));
         stage4Btn.setText(formatButtonText("스테이지 4: 심해", time4));
