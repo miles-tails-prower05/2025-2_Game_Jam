@@ -81,7 +81,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     // --- 동적 오브젝트 (공기 방울) ---
     private ArrayList<Bubble> activeBubbles; 
-    private int bubbleSpawnTimer = 0; 
+    private int bubbleSpawnTimer = 0;
+    
+    // --- 라이벌 캐릭터 (스테이지 6 전용) ---
+    private RivalCharacter rivalCharacter;
+    private boolean isRivalDefeated = false;
+    private int defeatMessageTimer = 0;
+    private final int DEFEAT_MESSAGE_DURATION = 120; // 2초 정도 
 
     class Bubble {
         int x, y, size, speed;
@@ -408,6 +414,25 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
              g.setColor(Color.RED);
              g.drawString(String.valueOf(currentOxygen/60), playerX, playerY - 20);
         }
+        
+        // 라이벌 캐릭터 (스테이지 6에서만)
+        if (rivalCharacter != null && currentStageName.equals("Rival Battle")) {
+            int rivalX = rivalCharacter.getX();
+            int rivalY = rivalCharacter.getY();
+            int rivalWidth = rivalCharacter.getWidth();
+            int rivalHeight = rivalCharacter.getHeight();
+            
+            // 라이벌을 빨간색 사각형으로 렌더링 (플레이어와 구분)
+            g.setColor(new Color(200, 0, 0)); // 어두운 빨간색
+            g.fillRect(rivalX, rivalY, rivalWidth, rivalHeight);
+            g.setColor(Color.BLACK);
+            g.drawRect(rivalX, rivalY, rivalWidth, rivalHeight);
+            
+            // 라이벌 위에 "RIVAL" 텍스트 표시
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 12));
+            g.drawString("RIVAL", rivalX, rivalY - 5);
+        }
     }
 
     private void drawUI(Graphics2D g) {
@@ -424,6 +449,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.setFont(new Font("Arial", Font.PLAIN, 20));
             g.drawString("Press SPACE or W to Restart", WINDOW_WIDTH/2 - 120, WINDOW_HEIGHT/2 + 50);
             return;
+        }
+        
+        // 라이벌에게 패배 메시지 표시
+        if (isRivalDefeated && defeatMessageTimer > 0) {
+            g.setColor(new Color(0, 0, 0, 150));
+            g.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+            
+            g.setColor(Color.RED);
+            g.setFont(new Font("Malgun Gothic", Font.BOLD, 50));
+            String msg = "라이벌에게 패배했습니다!";
+            FontMetrics fm = g.getFontMetrics();
+            int msgX = (WINDOW_WIDTH - fm.stringWidth(msg)) / 2;
+            g.drawString(msg, msgX, WINDOW_HEIGHT / 2);
         }
 
         if (isCleared) {
@@ -604,6 +642,31 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         checkInteractions();
         
+        // Update rival character (Stage 6 only)
+        if (rivalCharacter != null && currentStageName.equals("Rival Battle")) {
+            // Handle defeat message timer
+            if (isRivalDefeated && defeatMessageTimer > 0) {
+                defeatMessageTimer--;
+                if (defeatMessageTimer <= 0) {
+                    // Respawn after showing defeat message
+                    handleDeath();
+                    isRivalDefeated = false;
+                }
+                return; // Don't update anything while showing defeat message
+            }
+            
+            rivalCharacter.update(mapManager);
+            
+            // Check if rival reached the goal
+            Rectangle goal = mapManager.getGoalObject();
+            if (goal != null && rivalCharacter.getBounds().intersects(goal)) {
+                if (!isRivalDefeated) {
+                    isRivalDefeated = true;
+                    defeatMessageTimer = DEFEAT_MESSAGE_DURATION;
+                }
+            }
+        }
+        
         // Update animation state based on player movement
         updateAnimationState();
         
@@ -663,6 +726,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         // Reset springboards on respawn
         mapManager.resetSpringboards();
+        
+        // Reset rival character if in Stage 6
+        if (rivalCharacter != null && currentStageName.equals("Rival Battle")) {
+            rivalCharacter.reset(mapManager.getSpawnX() + 100, mapManager.getSpawnY());
+        }
     }
 
     private void checkCollisionX() {
@@ -843,5 +911,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         else setBackground(new Color(135, 206, 235));
         
         currentPlayTime = 0;
+        
+        // Initialize rival character for Stage 6
+        if (stage.equals("Rival Battle")) {
+            // Spawn rival slightly ahead of player
+            rivalCharacter = new RivalCharacter(mapManager.getSpawnX() + 100, mapManager.getSpawnY());
+            isRivalDefeated = false;
+            defeatMessageTimer = 0;
+        } else {
+            rivalCharacter = null;
+            isRivalDefeated = false;
+            defeatMessageTimer = 0;
+        }
     }
 }
