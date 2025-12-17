@@ -448,6 +448,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 if (isStoryMode) {
                     if ("스테이지 1".equals(currentStageName)) {
                         changeStage("스테이지 2");
+                    } else if ("스테이지 2".equals(currentStageName)) {
+                        changeStage("스테이지 3");
+                    } else if ("스테이지 3".equals(currentStageName)) {
+                        changeStage("스테이지 4");
+                    } else if ("스테이지 4".equals(currentStageName)) {
+                        changeStage("스테이지 5");
+                    } else if ("스테이지 5".equals(currentStageName)) {
+                        changeStage("스테이지 6");
+                    } else if ("스테이지 6".equals(currentStageName)) {
+                        changeStage("스테이지 7");
                     } else {
                         cards.show(frame, "TITLE");
                     }
