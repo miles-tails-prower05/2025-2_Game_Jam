@@ -300,8 +300,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     compressionOffset = (sb.getCompressionTimer() * 5) / sb.getCompressionDuration();
                 }
                 
-                // Draw springboard with similar appearance to platform but distinguishable
-                g.setColor(new Color(180, 100, 50)); // Same brown as regular platforms
+                // Draw springboard with slightly lighter brown to distinguish from regular platforms
+                g.setColor(new Color(200, 120, 60)); // Lighter brown than regular platforms
                 g.fillRect(springboard.x, springboard.y + compressionOffset, springboard.width, springboard.height - compressionOffset);
                 
                 // Add spring coil pattern to make it identifiable
