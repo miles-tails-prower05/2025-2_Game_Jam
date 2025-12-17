@@ -65,32 +65,25 @@ public class stageSelectPanel extends JPanel {
         addStageListener(stage6Btn, "Rival Battle");
         addStageListener(stage7Btn, "Remote Island");
         
-        // 3. 타이틀로 가기 버튼 (추가된 부분)
+        // 타이틀로 가기 버튼
         backToTitleBtn = new JButton("타이틀로 가기");
         backToTitleBtn.setFont(btnFont);
         backToTitleBtn.setPreferredSize(new Dimension(250, 80));
         backToTitleBtn.setBackground(new Color(150, 50, 50)); // 구분하기 쉽게 붉은 계열 색상 추가
         backToTitleBtn.setForeground(Color.WHITE);
-        backToTitleBtn.addActionListener(e -> {
+        backToTitleBtn. addActionListener(e -> {
             cards.show(frame, "TITLE"); // 타이틀 화면으로 이동
         });
         
+        // 버튼 추가 (3x3 그리드 순서대로, 타이틀로 가기 버튼은 맨 마지막)
         add(stage1Btn);
         add(stage2Btn);
-        add(backToTitleBtn);
         add(stage3Btn);
         add(stage4Btn);
         add(stage5Btn);
         add(stage6Btn);
         add(stage7Btn);
-        
-        // Back button
-        JButton backBtn = new JButton("뒤로가기");
-        backBtn.setFont(btnFont);
-        backBtn.addActionListener(e -> {
-            cards.show(frame, "TITLE");
-        });
-        add(backBtn);
+        add(backToTitleBtn); // 맨 마지막에 추가
         
         // ★ 추가: 이 패널이 화면에 보일 때마다 기록 갱신
         this.addComponentListener(new ComponentAdapter() {

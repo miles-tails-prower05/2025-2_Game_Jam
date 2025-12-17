@@ -36,7 +36,7 @@ public class AnimationController {
     
     // Animation timing
     private int frameCounter;
-    private final int FRAME_DELAY = 140; // Frames to wait before switching (approximately 128ms at 60fps)
+    private final int FRAME_DELAY = 10; // Frames to wait before switching (approximately 128ms at 60fps)
     private int currentWalkFrame;
     
     /**

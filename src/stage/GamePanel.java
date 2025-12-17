@@ -36,6 +36,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private ImageIcon charIcon;
     private Image charIconScaled;
     private Image rivalImage;
+    private Image goalImage;
     
     private boolean isStoryMode = false;
     
@@ -78,6 +79,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private int maxLives = 3;
     private int currentLives = 3;
     private long currentPlayTime = 0;
+    private int animSkipCounter = 0;
 
     // --- 클리어 상태 ---
     private boolean isCleared = false;
@@ -128,6 +130,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         } catch (IOException e) {
             System.err.println("Failed to load rival image: " + e.getMessage());
         }
+        try {
+            goalImage = ImageIO.read(getClass().getResource("/stage/images/piece.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         mapManager = new MapManager();
         this.frame = frame;
@@ -170,7 +177,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private void initPausePanel() {
         pausePanel = new JPanel();
         pausePanel.setBounds(WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2 - 150, 300, 300);
-        pausePanel.setBackground(new Color(0, 0, 0, 200)); 
+        pausePanel.setOpaque(false); // 이 줄을 추가해야 합니다! 
+        pausePanel.setBackground(new Color(0, 0, 0, 0)); // 완전 투명 
         pausePanel.setLayout(new GridLayout(4, 1, 10, 10)); 
         pausePanel.setVisible(false); 
 
@@ -374,12 +382,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // 클리어 오브젝트
         Rectangle goal = mapManager.getGoalObject();
         if (goal != null && goal.x + goal.width > cameraX && goal.x < cameraX + WINDOW_WIDTH) {
-            g.setColor(new Color(255, 215, 0)); 
-            g.fillOval(goal.x, goal.y, goal.width, goal.height);
-            g.setColor(Color.WHITE);
-            g.setStroke(new BasicStroke(2));
-            g.drawOval(goal.x, goal.y, goal.width, goal.height);
-            g.setStroke(new BasicStroke(1));
+            if (goalImage != null) {
+                g.drawImage(goalImage, goal.x, goal.y, goal.width, goal.height, null);
+            } else {
+                // 이미지 로드 실패 시 기본 도형 표시
+                g.setColor(new Color(255, 215, 0));
+                g.fillOval(goal.x, goal. y, goal.width, goal. height);
+            }
         }
 
         // 공기 방울
@@ -578,10 +587,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                         changeStage("Labyrinth");
                     } else if ("Labyrinth".equals(currentStageName)) {
                         changeStage("Rival Battle");
+                        eventPanel.startCutscene("stage6_script.txt", "GAME");
                     } else if ("Rival Battle".equals(currentStageName)) {
                         changeStage("Remote Island");
                     } else {
-                        cards.show(frame, "TITLE");
+                    	eventPanel.startCutscene("ending_script.txt", "TITLE");
                     }
                 } else {
                     cards.show(frame, "SELECT");
@@ -677,7 +687,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         updateAnimationState();
         
         // Update animation controller
-        animationController.update();
+        if (animationController.getState() == CharacterState.WALKING) {
+            animSkipCounter++;
+            if (animSkipCounter >= 3) {  // 3프레임마다 한 번씩만 업데이트
+                animationController.update();
+                animSkipCounter = 0;
+            }
+        } else {
+            // 걷기가 아닐 때는 카운터 리셋하고 즉시 업데이트
+            animSkipCounter = 0;
+            animationController.update();
+        }
 
         cameraX = playerX - WINDOW_WIDTH / 2;
         if (cameraX < 0) cameraX = 0; 

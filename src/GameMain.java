@@ -8,9 +8,17 @@ import ui.*;
 
 public class GameMain {
     public static void main(String[] args) {        
-        final JFrame frame = new JFrame("2D 플랫포머 게임");
+        final JFrame frame = new JFrame("Ultimate Shell");
         final CardLayout cards = new CardLayout();
         frame.setLayout(cards);
+        
+        // ★ 프로그램 아이콘 설정 (목숨 표시와 동일한 아이콘 사용)
+        try {
+            ImageIcon icon = new ImageIcon("src/stage/images/char_icon.png");
+            frame.setIconImage(icon.getImage());
+        } catch (Exception e) {
+            System.err.println("프로그램 아이콘 로드 실패: " + e. getMessage());
+        }
         
         SaveManager saveManager = new SaveManager();
         

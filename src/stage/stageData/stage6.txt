@@ -80,7 +80,7 @@ backgroundColor=#31a1de
 
 [SPRINGBOARDS]
 # x, y, width, height, propelHeight
-0, 540, 7000, 200, 10.0
+0, 540, 7000, 200, 7.0
 
 [BUBBLE_SPAWNERS]
 # 지상 레이싱이므로 버블 없음

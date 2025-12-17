@@ -45,7 +45,7 @@ public class titlePanel extends JPanel {
         startButton.setFont(new Font("Malgun Gothic", Font.BOLD, 20));
         
         // 2. 하위 버튼들 (초기에는 숨김)
-        storyButton = new JButton("스토리 진행");
+        storyButton = new JButton("스토리 모드");
         storyButton.setBounds(430, 500, 200, 50);
         storyButton.setFont(new Font("Malgun Gothic", Font.BOLD, 18));
         storyButton.setVisible(false);

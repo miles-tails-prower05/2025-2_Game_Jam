@@ -1,0 +1,3 @@
+scene_bg_08.png|face_antiPlayer.png||너는 아무것도 모르면서 방해하고 있어.
+scene_bg_08.png|face_antiPlayer.png||그 조각을 모아야 내 가족, 내 친구들이 살 수 있다고!
+scene_bg_08.png|face_antiPlayer.png||이 조각만큼은 내가 가지겠어!
