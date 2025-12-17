@@ -21,6 +21,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     // 현재 스테이지 이름 저장용 변수
     private String currentStageName; 
     
+    // --- 스테이지 이름 애니메이션 관련 ---
+    private boolean isShowingStageName = false;
+    private int stageNameAnimTimer = 0;
+    private final int ANIM_DURATION = 90; // 약 1.5초 (60fps 기준)
+    
     // --- UI 컴포넌트 ---
     private JButton menuButton;
     private JPanel pausePanel;
@@ -291,11 +296,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     private void drawUI(Graphics2D g) {
-    	// ★ 추가: 현재 경과 시간 표시 (우측 상단)
+    	// 1. 경과 시간 표시 (좌측 상단 최상단)
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 20));
         String timeStr = formatTime(currentPlayTime);
-        g.drawString("Time: " + timeStr, WINDOW_WIDTH - 200, 80);
+        g.drawString("Time: " + timeStr, 20, 40); // Y좌표를 40으로 설정
     	
         if (isDead) {
             g.setColor(Color.WHITE);
@@ -336,8 +341,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             return;
         }
 
+        // 2. 목숨 표시 (시간 표시 아래로 이동)
         int lifeIconX = 20;
-        int lifeIconY = 20; 
+        int lifeIconY = 55; // 시간 텍스트 아래에 위치하도록 Y좌표를 55로 조정
         
         g.setColor(Color.BLUE);
         g.fillRect(lifeIconX, lifeIconY, 30, 30);
@@ -347,6 +353,34 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 25));
         g.drawString("x " + (currentLives-1), lifeIconX + 40, lifeIconY + 25);
+        
+        // 3. 스테이지 이름 애니메이션 (기존 로직 유지)
+        if (isShowingStageName) {
+            int alpha = 255;
+            // 끝날 때쯤 서서히 투명해지는 효과
+            if (stageNameAnimTimer > ANIM_DURATION - 20) {
+                alpha = Math.max(0, (ANIM_DURATION - stageNameAnimTimer) * 12);
+            }
+
+            // 1. 파란색 장식 띠 (오른쪽에서 왼쪽으로 이동)
+            int barX = WINDOW_WIDTH - (stageNameAnimTimer * 20); 
+            if (stageNameAnimTimer > 30) barX = WINDOW_WIDTH - 600; // 특정 위치에 고정
+            
+            g.setColor(new Color(0, 50, 200, alpha));
+            g.fillRect(barX, 250, 700, 100);
+
+            // 2. 스테이지 이름 텍스트 (왼쪽에서 오른쪽으로 이동)
+            int targetTextX = 200;
+            int textX = Math.min(targetTextX, -300 + (stageNameAnimTimer * 15));
+
+            g.setFont(new Font("Malgun Gothic", Font.ITALIC | Font.BOLD, 50));
+            g.setColor(new Color(255, 255, 255, alpha));
+            g.drawString(currentStageName, textX, 320);
+            
+            // "ZONE" 텍스트 추가 (소닉 특유의 감성)
+            g.setFont(new Font("Arial", Font.BOLD, 30));
+            g.drawString("ZONE", textX + 250, 320);
+        }
     }
     
     // ★ 추가: 시간을 "분:초.밀리초" 형식으로 변환하는 헬퍼 메서드
@@ -358,6 +392,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     private void update() {
+    	// 스테이지 이름 연출 중 로직 처리
+        if (isShowingStageName) {
+            stageNameAnimTimer++;
+            if (stageNameAnimTimer > ANIM_DURATION) {
+                isShowingStageName = false;
+            }
+            // 연출 중에는 플레이어의 물리 업데이트를 건너뛰어 키 입력을 무효화함
+            velocityX = 0;
+            velocityY = 0;
+            return; 
+        }
+    	
     	if (isDead) return;
         
         if (isCleared) {
@@ -448,6 +494,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         playerY = 300;
         velocityX = 0;
         velocityY = 0;
+        cameraX = 0; // 스테이지 시작 시 카메라 위치도 즉시 초기화
         currentOxygen = maxOxygen; 
     }
 
@@ -553,6 +600,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void changeStage(String stage) {
         this.currentStageName = stage; 
         mapManager.loadLevel(stage);
+        
+        // 애니메이션 초기화
+        isShowingStageName = true;
+        stageNameAnimTimer = 0;
+        
+        currentLives = maxLives; 
+        respawn();
+        isDead = false;
+        isCleared = false; 
+        clearDelayTimer = 0;
         
         currentLives = maxLives; 
         respawn();
