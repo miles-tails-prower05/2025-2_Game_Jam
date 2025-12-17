@@ -15,14 +15,24 @@ public class AnimationController {
     private static final String WALK_IMAGE_PREFIX = IMAGE_BASE_PATH + "char_walk_0";
     private static final String WALK_IMAGE_SUFFIX = ".png";
     
+    // Water skiing image constants (for stage 6 - Rival Battle)
+    private static final String SKI_IDLE_IMAGE = IMAGE_BASE_PATH + "char_ski_idle.png";
+    private static final String SKI_MOVE_IMAGE_PREFIX = IMAGE_BASE_PATH + "char_ski_move_0";
+    private static final String SKI_MOVE_IMAGE_SUFFIX = ".png";
+    
     // Character state
     private CharacterState currentState;
     private boolean facingRight; // true = right, false = left
+    private boolean useWaterSkiingSprites; // true when in stage 6 (Rival Battle)
     
-    // Images for each state
+    // Normal images for each state
     private Image idleImage;
     private Image jumpImage;
     private Image[] walkImages; // 4 frames
+    
+    // Water skiing images for stage 6
+    private Image skiIdleImage;
+    private Image[] skiMoveImages; // 4 frames
     
     // Animation timing
     private int frameCounter;
@@ -35,11 +45,14 @@ public class AnimationController {
     public AnimationController() {
         this.currentState = CharacterState.IDLE;
         this.facingRight = true;
+        this.useWaterSkiingSprites = false;
         this.frameCounter = 0;
         this.currentWalkFrame = 0;
         this.walkImages = new Image[4];
+        this.skiMoveImages = new Image[4];
         
         loadImages();
+        loadWaterSkiingImages();
     }
     
     /**
@@ -101,6 +114,50 @@ public class AnimationController {
     }
     
     /**
+     * Loads water skiing images for stage 6 (Rival Battle).
+     */
+    private void loadWaterSkiingImages() {
+        boolean allLoaded = true;
+        
+        try {
+            // Load skiing idle image
+            ImageIcon skiIdleIcon = new ImageIcon(SKI_IDLE_IMAGE);
+            if (skiIdleIcon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                skiIdleImage = skiIdleIcon.getImage();
+            } else {
+                System.err.println("Warning: Failed to load water skiing idle image from " + SKI_IDLE_IMAGE);
+                allLoaded = false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading water skiing idle image: " + e.getMessage());
+            allLoaded = false;
+        }
+        
+        // Load skiing movement images
+        for (int i = 0; i < 4; i++) {
+            try {
+                String skiMovePath = SKI_MOVE_IMAGE_PREFIX + (i + 1) + SKI_MOVE_IMAGE_SUFFIX;
+                ImageIcon skiMoveIcon = new ImageIcon(skiMovePath);
+                if (skiMoveIcon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                    skiMoveImages[i] = skiMoveIcon.getImage();
+                } else {
+                    System.err.println("Warning: Failed to load water skiing move image " + (i + 1) + " from " + skiMovePath);
+                    allLoaded = false;
+                }
+            } catch (Exception e) {
+                System.err.println("Error loading water skiing move image " + (i + 1) + ": " + e.getMessage());
+                allLoaded = false;
+            }
+        }
+        
+        if (allLoaded) {
+            System.out.println("Water skiing images loaded successfully");
+        } else {
+            System.err.println("Warning: Some water skiing images failed to load. Stage 6 will use normal sprites.");
+        }
+    }
+    
+    /**
      * Updates the animation state. Should be called every frame.
      */
     public void update() {
@@ -154,6 +211,25 @@ public class AnimationController {
      * @return The Image to display for the current state and frame
      */
     public Image getCurrentFrame() {
+        // Use water skiing sprites if enabled and available
+        if (useWaterSkiingSprites) {
+            switch (currentState) {
+                case IDLE:
+                    return (skiIdleImage != null) ? skiIdleImage : idleImage;
+                case JUMPING:
+                    // Use skiing idle for jumping in water skiing mode
+                    return (skiIdleImage != null) ? skiIdleImage : jumpImage;
+                case WALKING:
+                    if (skiMoveImages[currentWalkFrame] != null) {
+                        return skiMoveImages[currentWalkFrame];
+                    }
+                    return (walkImages[currentWalkFrame] != null) ? walkImages[currentWalkFrame] : idleImage;
+                default:
+                    return (skiIdleImage != null) ? skiIdleImage : idleImage;
+            }
+        }
+        
+        // Normal sprites
         switch (currentState) {
             case IDLE:
                 return idleImage;
@@ -172,6 +248,15 @@ public class AnimationController {
      */
     public boolean isFacingRight() {
         return facingRight;
+    }
+    
+    /**
+     * Sets the current stage to determine which sprite set to use.
+     * @param stageName The name of the current stage
+     */
+    public void setStage(String stageName) {
+        // Enable water skiing sprites for stage 6 (Rival Battle)
+        useWaterSkiingSprites = "Rival Battle".equals(stageName);
     }
     
     /**

@@ -816,6 +816,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         this.currentStageName = stage; 
         mapManager.loadLevel(stage);
         
+        // Update animation controller for stage-specific sprites
+        if (animationController != null) {
+            animationController.setStage(stage);
+        }
+        
         // Reset breakable platforms
         mapManager.resetBreakablePlatforms();
         
