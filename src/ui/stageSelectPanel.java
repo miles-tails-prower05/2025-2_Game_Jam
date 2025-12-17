@@ -62,7 +62,7 @@ public class stageSelectPanel extends JPanel {
         addStageListener(stage3Btn, "Shattered Wreckage");
         addStageListener(stage4Btn, "Deep Water");
         addStageListener(stage5Btn, "Labyrinth");
-        addStageListener(stage6Btn, "스테이지 6");
+        addStageListener(stage6Btn, "Rival Battle");
         addStageListener(stage7Btn, "스테이지 7");
         
         // 3. 타이틀로 가기 버튼 (추가된 부분)
@@ -117,7 +117,7 @@ public class stageSelectPanel extends JPanel {
         long time3 = saveManager.getBestTime("Shattered Wreckage");
         long time4 = saveManager.getBestTime("Deep Water");
         long time5 = saveManager.getBestTime("Labyrinth");
-        long time6 = saveManager.getBestTime("스테이지 6");
+        long time6 = saveManager.getBestTime("Rival Battle");
         long time7 = saveManager.getBestTime("스테이지 7");
         
         stage1Btn.setText(formatButtonText("스테이지 1: Gold Coast", time1));
@@ -125,7 +125,7 @@ public class stageSelectPanel extends JPanel {
         stage3Btn.setText(formatButtonText("스테이지 3: Shattered Wreckage", time3));
         stage4Btn.setText(formatButtonText("스테이지 4: Deep Water", time4));
         stage5Btn.setText(formatButtonText("스테이지 5: Labyrinth", time5));
-        stage6Btn.setText(formatButtonText("스테이지 6: 평행 세계", time6));
+        stage6Btn.setText(formatButtonText("스테이지 6: Rival Battle", time6));
         stage7Btn.setText(formatButtonText("스테이지 7: 외딴 섬", time7));
     }
     

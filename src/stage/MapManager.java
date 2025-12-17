@@ -65,7 +65,7 @@ public class MapManager {
             fileName = "stage4.txt";
         } else if (stageName.equals("Labyrinth")) {
             fileName = "stage5.txt";
-        } else if (stageName.equals("스테이지 6")) {
+        } else if (stageName.equals("Rival Battle")) {
             fileName = "stage6.txt";
         } else if (stageName.equals("스테이지 7")) {
             fileName = "stage7.txt";
