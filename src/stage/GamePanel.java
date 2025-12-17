@@ -295,10 +295,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (springboard.x + springboard.width > cameraX && springboard.x < cameraX + WINDOW_WIDTH) {
                 // Calculate compression offset
                 int compressionOffset = 0;
-                if (sb.isCompressed()) {
+                //if (sb.isCompressed()) {
                     // Compress the springboard visually (reduce height from top)
-                    compressionOffset = (sb.getCompressionTimer() * 5) / sb.getCompressionDuration();
-                }
+                    //compressionOffset = (sb.getCompressionTimer() * 5) / sb.getCompressionDuration();
+                //}
                 
                 // Draw springboard with slightly lighter brown to distinguish from regular platforms
                 g.setColor(new Color(200, 120, 60)); // Lighter brown than regular platforms
