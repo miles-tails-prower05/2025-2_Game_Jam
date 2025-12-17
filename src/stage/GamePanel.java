@@ -133,22 +133,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // 버튼 스타일
         Font font = new Font("Malgun Gothic", Font.BOLD, 18);
 
-        // 1) 게임 계속하기 (편의상 추가)
+        // 1) 게임 계속하기
         btnResume = new JButton("계속하기");
         btnResume.setFont(font);
         btnResume.setFocusable(false);
         btnResume.addActionListener(e -> resumeGame());
 
-        // 2) 재시작
+        // 2) [수정] 스테이지 재시작 (목숨 차감 후 리스폰)
         btnRestart = new JButton("스테이지 재시작");
         btnRestart.setFont(font);
         btnRestart.setFocusable(false);
         btnRestart.addActionListener(e -> {
-            resumeGame(); // 패널 닫기
-            resetGame();  // 게임 리셋
+            resumeGame();  // 1. 일시정지 해제 (게임 루프 재개)
+            handleDeath(); // 2. 사망 처리 메서드 호출 (목숨 -1, 위치 초기화)
+                           // 만약 목숨이 0개라면 게임 오버 상태가 됩니다.
         });
 
-        // 3) 스테이지 선택 (스토리 모드일 때만 비활성화)
+        // 3) 스테이지 선택
         btnStageSelect = new JButton("스테이지 선택");
         btnStageSelect.setFont(font);
         btnStageSelect.setFocusable(false);
@@ -173,15 +174,21 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         add(pausePanel);
     }
 
- // 메뉴 열기
+    // 메뉴 열기
     private void showPauseMenu() {
         if (timer.isRunning()) {
             timer.stop(); // 게임 일시정지
         }
         
-        // [수정] 스토리 모드가 '아닐 때'만 스테이지 선택 가능
-        // (스토리 모드는 순서대로 진행해야 하므로 선택 불가)
+        // 스토리 모드가 아닐 때만 스테이지 선택 가능
         btnStageSelect.setEnabled(!isStoryMode);
+        
+        // 목숨이 1개(마지막) 이하라면 재시작 버튼 비활성화
+        if (currentLives <= 1) {
+            btnRestart.setEnabled(false);
+        } else {
+            btnRestart.setEnabled(true);
+        }
         
         menuButton.setVisible(false); // 메뉴 버튼 숨김
         pausePanel.setVisible(true);  // 일시정지 창 표시
@@ -288,24 +295,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             return;
         }
 
-        // 1. 산소 게이지 표시 (기존 코드)
-        if (mapManager.isUnderwater()) {
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.BOLD, 15));
-            g.drawString("AIR", 20, 30);
-            
-            if (currentOxygen < 300) g.setColor(Color.RED); 
-            else g.setColor(Color.CYAN);
-            
-            g.fillRect(50, 15, currentOxygen / 5, 20); 
-            g.setColor(Color.WHITE);
-            g.drawRect(50, 15, maxOxygen / 5, 20); 
-        }
+        // [수정] 산소 게이지 표시 UI 코드 삭제됨
 
-        // 2. 남은 목숨 표시 (추가된 부분)
-        // 위치: 산소 게이지 아래쪽
+        // [수정] 남은 목숨 표시 (산소 게이지가 있던 자리로 위치 이동)
         int lifeIconX = 20;
-        int lifeIconY = 50;
+        int lifeIconY = 20; // 기존 50 -> 20 (화면 좌측 상단)
         
         // 캐릭터 얼굴 아이콘 (플레이어와 같은 파란색 사각형)
         g.setColor(Color.BLUE);
@@ -316,28 +310,23 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // 남은 목숨 숫자
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 25));
-        g.drawString("x " + currentLives, lifeIconX + 40, lifeIconY + 25);
-        
-        // 스테이지 모드 표시 (위치를 조금 아래로 내림)
-        if (!mapManager.isUnderwater()) {
-            g.setColor(Color.BLACK);
-            g.setFont(new Font("Arial", Font.BOLD, 20));
-            g.drawString("STAGE MODE", 20, 120);
-        }
+        g.drawString("x " + (currentLives-1), lifeIconX + 40, lifeIconY + 25);
     }
 
     private void update() {
     	if (isDead) return;
         
+        // [수정] 수중 상태 로직 통합 및 산소 고갈 시 처리 변경
         if (mapManager.isUnderwater()) {
-            currentOxygen--;
-            if (currentOxygen <= 0) handleDeath(); // [변경] 즉사 -> 목숨 차감
-        }
-        
-        if (mapManager.isUnderwater()) {
-            currentOxygen--;
-            if (currentOxygen <= 0) isDead = true;
+            currentOxygen--; // 산소 감소
+            
+            // 산소가 다 떨어졌을 때 로직
+            if (currentOxygen <= 0) {
+                handleDeath(); // [변경] 즉시 게임오버가 아니라 handleDeath() 호출
+                // handleDeath() 내에서 목숨이 남아있으면 respawn()이 호출되어 currentOxygen이 회복됨.
+            }
 
+            // 공기 방울 생성 및 이동 로직 (기존 코드 유지)
             bubbleSpawnTimer++;
             if (bubbleSpawnTimer > 100) {
                 int[] spawners = mapManager.getBubbleSpawnersX();
@@ -361,7 +350,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-        // 물리 엔진
+        // 물리 엔진 (기존 코드와 동일)
         if (leftPressed) velocityX = -mapManager.getSpeed();
         else if (rightPressed) velocityX = mapManager.getSpeed();
         else velocityX *= mapManager.getFriction(); 
