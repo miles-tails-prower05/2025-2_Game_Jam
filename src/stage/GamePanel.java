@@ -235,12 +235,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.drawLine(i, 0, i, WINDOW_HEIGHT);
         }
 
-        if (mapManager.isUnderwater()) {
-            g.setColor(Color.BLACK);
-            for(int x : mapManager.getBubbleSpawnersX()) {
-                g.fillOval(x, 550, 30, 10);
-            }
-        }
+        //if (mapManager.isUnderwater()) {
+            //g.setColor(Color.BLACK);
+            //for(int x : mapManager.getBubbleSpawnersX()) {
+                //g.fillOval(x, 550, 30, 10);
+            //}
+        //}
 
         // 플랫폼
         Color platformColor = mapManager.getStageColors().getPlatformColor();
@@ -480,8 +480,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (clearDelayTimer > 180) {
                 if (isStoryMode) {
                     if ("Gold Coast".equals(currentStageName)) {
-                        changeStage("스테이지 2");
-                    } else if ("스테이지 2".equals(currentStageName)) {
+                        changeStage("Emerald Sea");
+                    } else if ("Emerald Sea".equals(currentStageName)) {
                         changeStage("스테이지 3");
                     } else if ("스테이지 3".equals(currentStageName)) {
                         changeStage("스테이지 4");

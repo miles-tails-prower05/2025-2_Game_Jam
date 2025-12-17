@@ -5,10 +5,10 @@ spawnX=50
 spawnY=510
 
 [PHYSICS]
-gravity=0.3
-jumpStrength=-9.0
-speed=5.0
-friction=0.95
+gravity=0.6
+jumpStrength=-12.0
+speed=7.0
+friction=0.85
 
 [COLORS]
 # Hex format: #RRGGBB or RGB format: R,G,B

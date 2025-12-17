@@ -1,36 +1,39 @@
 [MAP_INFO]
-levelWidth=2000
-isUnderwater=false
+levelWidth=4000
+isUnderwater=true
 spawnX=50
 spawnY=560
 
 [PHYSICS]
-gravity=0.6
-jumpStrength=-12.0
-speed=8.0
-friction=0.8
+gravity=0.35
+jumpStrength=-9.5
+speed=6.0
+friction=0.9
 
 [COLORS]
 # Hex format: #RRGGBB or RGB format: R,G,B
 # If not specified, default colors will be used
-platformColor=#8B4513
-spikeColor=#FF4444
-breakablePlatformColor=#654321
-springboardColor=#DAA520
+platformColor=#008080
+spikeColor=#778899
+breakablePlatformColor=#00ced1
+springboardColor=#f5fffa
 
 [PLATFORMS]
 # x, y, width, height
-0, 600, 2000, 200
+0, 600, 1000, 200
 -50, 0, 50, 720
-2000, 0, 50, 720
 300, 500, 100, 20
 500, 400, 100, 20
 700, 300, 100, 20
+1800, 500, 100, 20
+2000, 400, 80, 20
+2700, 400, 80, 20
+3500, 400, 50, 20
+3800, 600, 200, 200
 
 [BREAKABLE_PLATFORMS]
 # x, y, width, height
-900, 450, 100, 20
-1200, 350, 100, 20
+
 
 [SPIKES]
 600, 570, 100, 30
@@ -38,9 +41,14 @@ springboardColor=#DAA520
 [SPRINGBOARDS]
 # x, y, width, height, propelHeight
 900, 580, 80, 20, 15.0
+1200, 400, 80, 20, 15.0
+2300, 300, 80, 20, 15.0
+2500, 500, 80, 20, 15.0
+3150, 400, 80, 20, 15.0
 
 [BUBBLE_SPAWNERS]
-# 없음
+# x coordinates
+500, 2000
 
 [GOAL]
-1900, 550, 40, 40
+3900, 550, 40, 40
