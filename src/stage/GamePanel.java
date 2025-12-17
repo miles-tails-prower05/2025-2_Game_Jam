@@ -490,8 +490,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     private void respawn() {
-        playerX = 50;   
-        playerY = 300;
+    	playerX = mapManager.getSpawnX();   
+        playerY = mapManager.getSpawnY();
         velocityX = 0;
         velocityY = 0;
         cameraX = 0; // 스테이지 시작 시 카메라 위치도 즉시 초기화

@@ -14,6 +14,9 @@ public class MapManager {
     private int[] bubbleSpawnersX;
     private int levelWidth;
     
+    private int spawnX;
+    private int spawnY;
+    
     // ★ 클리어 오브젝트
     private Rectangle goalObject;
 
@@ -123,6 +126,8 @@ public class MapManager {
 
         if (key.equals("levelWidth")) levelWidth = Integer.parseInt(value);
         else if (key.equals("isUnderwater")) isUnderwater = Boolean.parseBoolean(value);
+        else if (key.equals("spawnX")) spawnX = Integer.parseInt(value);
+        else if (key.equals("spawnY")) spawnY = Integer.parseInt(value);
     }
 
     private void parsePhysics(String line) {
@@ -153,6 +158,9 @@ public class MapManager {
     public Rectangle getGoalObject() { return goalObject; }
     public int[] getBubbleSpawnersX() { return bubbleSpawnersX; }
     public int getLevelWidth() { return levelWidth; }
+    
+    public int getSpawnX() { return spawnX; }
+    public int getSpawnY() { return spawnY; }
     
     public double getGravity() { return gravity; }
     public double getJumpStrength() { return jumpStrength; }

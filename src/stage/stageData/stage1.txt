@@ -1,6 +1,8 @@
 [MAP_INFO]
 levelWidth=3000
 isUnderwater=true
+spawnX=50
+spawnY=510
 
 [PHYSICS]
 gravity=0.3
