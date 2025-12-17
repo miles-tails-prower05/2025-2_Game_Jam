@@ -60,7 +60,7 @@ public class stageSelectPanel extends JPanel {
         addStageListener(stage1Btn, "Gold Coast");
         addStageListener(stage2Btn, "Emerald Sea");
         addStageListener(stage3Btn, "Shattered Wreckage");
-        addStageListener(stage4Btn, "스테이지 4");
+        addStageListener(stage4Btn, "Deep Water");
         addStageListener(stage5Btn, "스테이지 5");
         addStageListener(stage6Btn, "스테이지 6");
         addStageListener(stage7Btn, "스테이지 7");
@@ -115,7 +115,7 @@ public class stageSelectPanel extends JPanel {
         long time1 = saveManager.getBestTime("Gold Coast");
         long time2 = saveManager.getBestTime("Emerald Sea");
         long time3 = saveManager.getBestTime("Shattered Wreckage");
-        long time4 = saveManager.getBestTime("스테이지 4");
+        long time4 = saveManager.getBestTime("Deep Water");
         long time5 = saveManager.getBestTime("스테이지 5");
         long time6 = saveManager.getBestTime("스테이지 6");
         long time7 = saveManager.getBestTime("스테이지 7");
@@ -123,7 +123,7 @@ public class stageSelectPanel extends JPanel {
         stage1Btn.setText(formatButtonText("스테이지 1: Gold Coast", time1));
         stage2Btn.setText(formatButtonText("스테이지 2: Emerald Sea", time2));
         stage3Btn.setText(formatButtonText("스테이지 3: Shattered Wreckage", time3));
-        stage4Btn.setText(formatButtonText("스테이지 4: 심해", time4));
+        stage4Btn.setText(formatButtonText("스테이지 4: Deep Water", time4));
         stage5Btn.setText(formatButtonText("스테이지 5: 수중 미로", time5));
         stage6Btn.setText(formatButtonText("스테이지 6: 평행 세계", time6));
         stage7Btn.setText(formatButtonText("스테이지 7: 외딴 섬", time7));
