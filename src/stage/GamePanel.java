@@ -10,18 +10,20 @@ import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
     // --- 카드 레이아웃 관련 ---
-	private Container frame;
-	private CardLayout cards;
-	private String panel;
-	
-	// --- UI 컴포넌트 ---
+    private Container frame;
+    private CardLayout cards;
+    private String panel; 
+    
+    // 현재 스테이지 이름 저장용 변수
+    private String currentStageName; 
+    
+    // --- UI 컴포넌트 ---
     private JButton menuButton;
     private JPanel pausePanel;
     private JButton btnRestart, btnStageSelect, btnExitTitle, btnResume;
     
-    // --- 게임 모드 플래그 ---
     private boolean isStoryMode = false;
-	
+    
     // --- 설정 변수 ---
     private Timer timer;
     private final int DELAY = 16;
@@ -53,14 +55,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private int maxOxygen = 1000;
     private int currentOxygen = maxOxygen;
     private boolean isDead = false;
-    private int maxLives = 3;        // 최대 목숨
-    private int currentLives = 3;    // 현재 목숨
+    private int maxLives = 3;
+    private int currentLives = 3;
+
+    // --- 클리어 상태 ---
+    private boolean isCleared = false;
+    private int clearDelayTimer = 0;
 
     // --- 동적 오브젝트 (공기 방울) ---
     private ArrayList<Bubble> activeBubbles; 
     private int bubbleSpawnTimer = 0; 
 
-    // 내부 클래스: Bubble
     class Bubble {
         int x, y, size, speed;
         public Bubble(int startX, int startY) {
@@ -77,7 +82,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     public GamePanel(Container frame, CardLayout cards, String panel) {
-        // [레이아웃 변경] 절대 위치 배치를 위해 null 레이아웃 사용
         setLayout(null);
         
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -90,30 +94,27 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         this.cards = cards;
         this.panel = panel;
 
-        // --- 1. 메뉴 버튼 생성 (우측 상단) ---
         menuButton = new JButton("MENU");
         menuButton.setBounds(WINDOW_WIDTH - 100, 20, 80, 40);
-        menuButton.setFocusable(false); // 키보드 포커스 뺏기지 않도록 설정
+        menuButton.setFocusable(false); 
         menuButton.addActionListener(e -> showPauseMenu());
         add(menuButton);
 
-        // --- 2. 일시정지 패널(팝업) 생성 ---
         initPausePanel();
 
-        // 초기 설정
         changeStage(this.panel);
         activeBubbles = new ArrayList<>();
         
         timer = new Timer(DELAY, this);
         timer.start();
 
-        // (기존 리스너 유지: 화면 전환 시 타이머 관리)
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
                 if (timer != null && !timer.isRunning()) timer.start();
-                pausePanel.setVisible(false); // 화면 돌아오면 메뉴 닫기
+                pausePanel.setVisible(false); 
                 menuButton.setVisible(true);
+                GamePanel.this.requestFocusInWindow();
             }
             @Override
             public void componentHidden(ComponentEvent e) {
@@ -122,43 +123,36 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         });
     }
     
-    // 일시정지 메뉴 UI 초기화
     private void initPausePanel() {
         pausePanel = new JPanel();
         pausePanel.setBounds(WINDOW_WIDTH / 2 - 150, WINDOW_HEIGHT / 2 - 150, 300, 300);
-        pausePanel.setBackground(new Color(0, 0, 0, 200)); // 반투명 검정 배경
-        pausePanel.setLayout(new GridLayout(4, 1, 10, 10)); // 4개의 버튼 세로 나열
-        pausePanel.setVisible(false); // 처음엔 숨김
+        pausePanel.setBackground(new Color(0, 0, 0, 200)); 
+        pausePanel.setLayout(new GridLayout(4, 1, 10, 10)); 
+        pausePanel.setVisible(false); 
 
-        // 버튼 스타일
         Font font = new Font("Malgun Gothic", Font.BOLD, 18);
 
-        // 1) 게임 계속하기
         btnResume = new JButton("계속하기");
         btnResume.setFont(font);
         btnResume.setFocusable(false);
         btnResume.addActionListener(e -> resumeGame());
 
-        // 2) [수정] 스테이지 재시작 (목숨 차감 후 리스폰)
         btnRestart = new JButton("스테이지 재시작");
         btnRestart.setFont(font);
         btnRestart.setFocusable(false);
         btnRestart.addActionListener(e -> {
-            resumeGame();  // 1. 일시정지 해제 (게임 루프 재개)
-            handleDeath(); // 2. 사망 처리 메서드 호출 (목숨 -1, 위치 초기화)
-                           // 만약 목숨이 0개라면 게임 오버 상태가 됩니다.
+            resumeGame();
+            handleDeath(); 
         });
 
-        // 3) 스테이지 선택
         btnStageSelect = new JButton("스테이지 선택");
         btnStageSelect.setFont(font);
         btnStageSelect.setFocusable(false);
-        btnStageSelect.setEnabled(false); // 기본 비활성화
+        btnStageSelect.setEnabled(false); 
         btnStageSelect.addActionListener(e -> {
             cards.show(frame, "SELECT");
         });
 
-        // 4) 타이틀로 나가기
         btnExitTitle = new JButton("타이틀로 나가기");
         btnExitTitle.setFont(font);
         btnExitTitle.setFocusable(false);
@@ -174,37 +168,32 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         add(pausePanel);
     }
 
-    // 메뉴 열기
     private void showPauseMenu() {
         if (timer.isRunning()) {
-            timer.stop(); // 게임 일시정지
+            timer.stop(); 
         }
         
-        // 스토리 모드가 아닐 때만 스테이지 선택 가능
         btnStageSelect.setEnabled(!isStoryMode);
         
-        // 목숨이 1개(마지막) 이하라면 재시작 버튼 비활성화
         if (currentLives <= 1) {
             btnRestart.setEnabled(false);
         } else {
             btnRestart.setEnabled(true);
         }
         
-        menuButton.setVisible(false); // 메뉴 버튼 숨김
-        pausePanel.setVisible(true);  // 일시정지 창 표시
+        menuButton.setVisible(false);
+        pausePanel.setVisible(true); 
     }
 
-    // 메뉴 닫기 (게임 재개)
     private void resumeGame() {
         pausePanel.setVisible(false);
         menuButton.setVisible(true);
         if (!timer.isRunning()) {
             timer.start();
         }
-        this.requestFocus(); // 키보드 제어권을 다시 가져옴 (중요)
+        this.requestFocus(); 
     }
 
-    // 모드 설정 (외부에서 호출)
     public void setStoryMode(boolean isStoryMode) {
         this.isStoryMode = isStoryMode;
     }
@@ -223,7 +212,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     private void drawWorld(Graphics2D g) {
-        // 배경 설정
         if (mapManager.isUnderwater()) {
              g.setColor(new Color(0, 80, 0)); 
         } else {
@@ -234,7 +222,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.drawLine(i, 0, i, WINDOW_HEIGHT);
         }
 
-        // 스포너 (물 속일 때만)
         if (mapManager.isUnderwater()) {
             g.setColor(Color.BLACK);
             for(int x : mapManager.getBubbleSpawnersX()) {
@@ -263,6 +250,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
+        // 클리어 오브젝트
+        Rectangle goal = mapManager.getGoalObject();
+        if (goal != null && goal.x + goal.width > cameraX && goal.x < cameraX + WINDOW_WIDTH) {
+            g.setColor(new Color(255, 215, 0)); 
+            g.fillOval(goal.x, goal.y, goal.width, goal.height);
+            g.setColor(Color.WHITE);
+            g.setStroke(new BasicStroke(2));
+            g.drawOval(goal.x, goal.y, goal.width, goal.height);
+            g.setStroke(new BasicStroke(1));
+        }
+
         // 공기 방울
         if (mapManager.isUnderwater()) {
             g.setColor(new Color(173, 216, 230, 180)); 
@@ -277,7 +275,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.BLUE);
         g.fillRect(playerX, playerY, playerWidth, playerHeight);
         
-        // 카운트다운
         if (mapManager.isUnderwater() && currentOxygen < 300 && (currentOxygen / 20) % 2 == 0) {
              g.setFont(new Font("Arial", Font.BOLD, 40));
              g.setColor(Color.RED);
@@ -295,19 +292,37 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             return;
         }
 
-        // [수정] 산소 게이지 표시 UI 코드 삭제됨
+        if (isCleared) {
+            g.setColor(new Color(0, 0, 0, 150));
+            g.fillRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+            
+            g.setColor(Color.YELLOW);
+            
+            // ★ 모드에 따라 텍스트 크기와 내용 변경
+            String msg;
+            if (isStoryMode) {
+                g.setFont(new Font("Malgun Gothic", Font.BOLD, 60));
+                msg = "조각을 찾았습니다!";
+            } else {
+                g.setFont(new Font("Malgun Gothic", Font.BOLD, 50)); // 텍스트가 기므로 폰트 조금 줄임
+                msg = "스테이지를 클리어 했습니다!";
+            }
 
-        // [수정] 남은 목숨 표시 (산소 게이지가 있던 자리로 위치 이동)
+            FontMetrics fm = g.getFontMetrics();
+            int msgX = (WINDOW_WIDTH - fm.stringWidth(msg)) / 2;
+            int msgY = WINDOW_HEIGHT / 2;
+            g.drawString(msg, msgX, msgY);
+            return;
+        }
+
         int lifeIconX = 20;
-        int lifeIconY = 20; // 기존 50 -> 20 (화면 좌측 상단)
+        int lifeIconY = 20; 
         
-        // 캐릭터 얼굴 아이콘 (플레이어와 같은 파란색 사각형)
         g.setColor(Color.BLUE);
         g.fillRect(lifeIconX, lifeIconY, 30, 30);
-        g.setColor(Color.BLACK); // 테두리
+        g.setColor(Color.BLACK); 
         g.drawRect(lifeIconX, lifeIconY, 30, 30);
 
-        // 남은 목숨 숫자
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 25));
         g.drawString("x " + (currentLives-1), lifeIconX + 40, lifeIconY + 25);
@@ -316,17 +331,29 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private void update() {
     	if (isDead) return;
         
-        // [수정] 수중 상태 로직 통합 및 산소 고갈 시 처리 변경
+        if (isCleared) {
+            clearDelayTimer++;
+            if (clearDelayTimer > 180) {
+                if (isStoryMode) {
+                    if ("스테이지 1".equals(currentStageName)) {
+                        changeStage("스테이지 2");
+                    } else {
+                        cards.show(frame, "TITLE");
+                    }
+                } else {
+                    cards.show(frame, "SELECT");
+                }
+            }
+            return; 
+        }
+
         if (mapManager.isUnderwater()) {
-            currentOxygen--; // 산소 감소
+            currentOxygen--; 
             
-            // 산소가 다 떨어졌을 때 로직
             if (currentOxygen <= 0) {
-                handleDeath(); // [변경] 즉시 게임오버가 아니라 handleDeath() 호출
-                // handleDeath() 내에서 목숨이 남아있으면 respawn()이 호출되어 currentOxygen이 회복됨.
+                handleDeath(); 
             }
 
-            // 공기 방울 생성 및 이동 로직 (기존 코드 유지)
             bubbleSpawnTimer++;
             if (bubbleSpawnTimer > 100) {
                 int[] spawners = mapManager.getBubbleSpawnersX();
@@ -350,7 +377,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
-        // 물리 엔진 (기존 코드와 동일)
         if (leftPressed) velocityX = -mapManager.getSpeed();
         else if (rightPressed) velocityX = mapManager.getSpeed();
         else velocityX *= mapManager.getFriction(); 
@@ -377,24 +403,21 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             cameraX = mapManager.getLevelWidth() - WINDOW_WIDTH;
     }
         
-    // [수정] 사망 처리 로직 분리
     private void handleDeath() {
-        currentLives--; // 목숨 감소
+        currentLives--; 
         if (currentLives > 0) {
-            respawn(); // 목숨 남았으면 부활
+            respawn(); 
         } else {
-            isDead = true; // 목숨 없으면 게임 오버
+            isDead = true; 
         }
     }
 
-    // [추가] 리스폰(부활) 메서드: 위치와 상태만 초기화
     private void respawn() {
-        playerX = 50;   // 시작 위치로 이동
+        playerX = 50;   
         playerY = 300;
         velocityX = 0;
         velocityY = 0;
-        currentOxygen = maxOxygen; // 산소 회복
-        // 필요한 경우 activeBubbles.clear(); 추가
+        currentOxygen = maxOxygen; 
     }
 
     private void checkCollisionX() {
@@ -408,7 +431,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
-    // [수정] checkCollisionY: 낙사 시 handleDeath 호출
     private void checkCollisionY() {
         Rectangle playerRect = new Rectangle(playerX, playerY, playerWidth, playerHeight);
         for (Rectangle platform : mapManager.getPlatforms()) {
@@ -423,17 +445,24 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 }
             }
         }
-        // 화면 아래로 떨어지면 사망 처리
         if (playerY > WINDOW_HEIGHT) handleDeath(); 
     }
 
-    // [수정] checkInteractions: 가시 닿으면 handleDeath 호출
     private void checkInteractions() {
         Rectangle playerRect = new Rectangle(playerX, playerY, playerWidth, playerHeight);
+        
         for (Rectangle spike : mapManager.getSpikes()) {
             if (playerRect.intersects(spike)) {
                 handleDeath(); 
-                return; // 한 번 닿으면 즉시 처리하고 반환 (중복 호출 방지)
+                return; 
+            }
+        }
+        
+        Rectangle goal = mapManager.getGoalObject();
+        if (goal != null && playerRect.intersects(goal)) {
+            if (!isCleared) {
+                isCleared = true;
+                clearDelayTimer = 0;
             }
         }
     }
@@ -468,14 +497,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-        // 필수 구현 메서드 (비워둠)
     }
 
-    // [수정] resetGame: 게임 완전 재시작 시 목숨도 초기화
     private void resetGame() {
-        currentLives = maxLives; // 목숨 초기화
-        respawn();               // 위치 초기화
+        currentLives = maxLives; 
+        respawn();               
         isDead = false;
+        isCleared = false; 
+        clearDelayTimer = 0;
         
         if (activeBubbles != null) activeBubbles.clear();
         
@@ -485,13 +514,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         jumpLocked = false;
     }
     
-    // [수정] 스테이지 변경 시에도 리셋 적용
     public void changeStage(String stage) {
+        this.currentStageName = stage; 
         mapManager.loadLevel(stage);
         
-        currentLives = maxLives; // 새 스테이지에서는 목숨 초기화
+        currentLives = maxLives; 
         respawn();
         isDead = false;
+        isCleared = false; 
+        clearDelayTimer = 0;
         
         if (activeBubbles != null) activeBubbles.clear();
 
