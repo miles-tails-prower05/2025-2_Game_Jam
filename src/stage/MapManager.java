@@ -30,12 +30,16 @@ public class MapManager {
     
     // ★ 환경 설정
     private boolean isUnderwater;
+    
+    // ★ 색상 설정
+    private StageColors stageColors;
 
     public MapManager() {
         platforms = new ArrayList<>();
         spikes = new ArrayList<>();
         breakablePlatforms = new ArrayList<>();
         springboards = new ArrayList<>();
+        stageColors = new StageColors();
     }
 
     // 스테이지 이름을 받아 해당 파일을 로드
@@ -46,6 +50,7 @@ public class MapManager {
         springboards.clear();
         goalObject = null;
         bubbleSpawnersX = new int[0]; // 초기화
+        stageColors = new StageColors(); // 색상 초기화
 
         String fileName = "";
         
@@ -104,6 +109,9 @@ public class MapManager {
                         break;
                     case "PHYSICS":
                         parsePhysics(line);
+                        break;
+                    case "COLORS":
+                        parseColors(line);
                         break;
                     case "PLATFORMS":
                         platforms.add(parseRectangle(line));
@@ -164,6 +172,18 @@ public class MapManager {
         else if (key.equals("speed")) speed = Double.parseDouble(value);
         else if (key.equals("friction")) friction = Double.parseDouble(value);
     }
+    
+    private void parseColors(String line) {
+        String[] parts = line.split("=");
+        if (parts.length < 2) return;
+        String key = parts[0].trim();
+        String value = parts[1].trim();
+        
+        if (key.equals("platformColor")) stageColors.setPlatformColor(value);
+        else if (key.equals("spikeColor")) stageColors.setSpikeColor(value);
+        else if (key.equals("breakablePlatformColor")) stageColors.setBreakablePlatformColor(value);
+        else if (key.equals("springboardColor")) stageColors.setSpringboardColor(value);
+    }
 
     // "x, y, w, h" 문자열을 Rectangle로 변환
     private Rectangle parseRectangle(String line) {
@@ -203,6 +223,7 @@ public class MapManager {
     public double getSpeed() { return speed; }
     public double getFriction() { return friction; }
     public boolean isUnderwater() { return isUnderwater; }
+    public StageColors getStageColors() { return stageColors; }
     
     /**
      * Updates all breakable platforms

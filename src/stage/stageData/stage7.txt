@@ -1,12 +1,21 @@
 [MAP_INFO]
 levelWidth=3000
 isUnderwater=false
+spawnX=50
+spawnY=550
 
 [PHYSICS]
 gravity=0.6
 jumpStrength=-12.0
 speed=7.0
 friction=0.85
+
+[COLORS]
+# Island beach theme - tropical paradise
+platformColor=#D2691E
+spikeColor=#8B0000
+breakablePlatformColor=#CD853F
+springboardColor=#228B22
 
 [PLATFORMS]
 # x, y, width, height
