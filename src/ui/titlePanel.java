@@ -73,6 +73,28 @@ public class titlePanel extends JPanel {
         add(startButton);
         add(storyButton);
         add(stageSelectButton);
+        
+        // 타이틀 화면(패널)이 다시 화면에 그려질 때마다 실행되는 리스너입니다.
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                resetTitleUI();
+            }
+        });
+    }
+    
+    // 타이틀 화면의 UI 상태를 초기화하는 메서드
+    private void resetTitleUI() {
+        // 버튼을 다시 보이게 설정
+    	startButton.setVisible(true);
+    	storyButton.setVisible(false);
+        stageSelectButton.setVisible(false);
+        
+        // 만약 애니메이션이나 다른 UI 요소가 있다면 여기서 초기화합니다.
+        // 예: startBtn.setText("게임 시작");
+        
+        revalidate();
+        repaint();
     }
 
     @Override

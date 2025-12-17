@@ -300,7 +300,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 20));
         String timeStr = formatTime(currentPlayTime);
-        g.drawString("Time: " + timeStr, 20, 40); // Y좌표를 40으로 설정
+        g.drawString("TIME: " + timeStr, 20, 40); // Y좌표를 40으로 설정
     	
         if (isDead) {
             g.setColor(Color.WHITE);
@@ -333,7 +333,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.drawString(msg, msgX, msgY);
 
             // ★ 추가: 클리어 화면에 기록 표시
-            String clearTimeStr = "Clear Time: " + formatTime(currentPlayTime);
+            String clearTimeStr = "TIME: " + formatTime(currentPlayTime);
             g.setFont(new Font("Malgun Gothic", Font.BOLD, 30));
             FontMetrics fm1 = g.getFontMetrics();
             int timeX = (WINDOW_WIDTH - fm1.stringWidth(clearTimeStr)) / 2;

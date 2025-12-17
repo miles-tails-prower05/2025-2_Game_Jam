@@ -17,6 +17,7 @@ public class stageSelectPanel extends JPanel {
     // ★ 버튼을 멤버 변수로 승격
     private JButton stage1Btn;
     private JButton stage2Btn;
+    private JButton backToTitleBtn; // 타이틀로 가기 버튼 추가
 
     public stageSelectPanel(Container frame, CardLayout cards, GamePanel gamePanel, SaveManager saveManager) {
         this.frame = frame;
@@ -53,8 +54,19 @@ public class stageSelectPanel extends JPanel {
             gamePanel.requestFocus();
         });
         
+        // 3. 타이틀로 가기 버튼 (추가된 부분)
+        backToTitleBtn = new JButton("타이틀로 가기");
+        backToTitleBtn.setFont(btnFont);
+        backToTitleBtn.setPreferredSize(new Dimension(250, 80));
+        backToTitleBtn.setBackground(new Color(150, 50, 50)); // 구분하기 쉽게 붉은 계열 색상 추가
+        backToTitleBtn.setForeground(Color.WHITE);
+        backToTitleBtn.addActionListener(e -> {
+            cards.show(frame, "TITLE"); // 타이틀 화면으로 이동
+        });
+        
         add(stage1Btn);
         add(stage2Btn);
+        add(backToTitleBtn);
         
         // ★ 추가: 이 패널이 화면에 보일 때마다 기록 갱신
         this.addComponentListener(new ComponentAdapter() {
