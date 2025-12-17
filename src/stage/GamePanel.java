@@ -289,6 +289,35 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
         }
 
+        // 스프링보드
+        for (Springboard sb : mapManager.getSpringboards()) {
+            Rectangle springboard = sb.getBounds();
+            if (springboard.x + springboard.width > cameraX && springboard.x < cameraX + WINDOW_WIDTH) {
+                // Calculate compression offset
+                int compressionOffset = 0;
+                if (sb.isCompressed()) {
+                    // Compress the springboard visually (reduce height from top)
+                    compressionOffset = (sb.getCompressionTimer() * 5) / sb.getCompressionDuration();
+                }
+                
+                // Draw springboard with slightly lighter brown to distinguish from regular platforms
+                g.setColor(new Color(200, 120, 60)); // Lighter brown than regular platforms
+                g.fillRect(springboard.x, springboard.y + compressionOffset, springboard.width, springboard.height - compressionOffset);
+                
+                // Add spring coil pattern to make it identifiable
+                g.setColor(Color.DARK_GRAY);
+                int coilCount = 3;
+                for (int i = 0; i < coilCount; i++) {
+                    int coilY = springboard.y + compressionOffset + (springboard.height - compressionOffset) / 2;
+                    int coilX = springboard.x + (i + 1) * springboard.width / (coilCount + 1);
+                    g.fillOval(coilX - 3, coilY - 3, 6, 6);
+                }
+                
+                g.setColor(Color.BLACK);
+                g.drawRect(springboard.x, springboard.y + compressionOffset, springboard.width, springboard.height - compressionOffset);
+            }
+        }
+
         // 가시
         g.setColor(Color.LIGHT_GRAY);
         for (Rectangle spike : mapManager.getSpikes()) {
@@ -520,6 +549,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         // Update breakable platforms
         mapManager.updateBreakablePlatforms();
+        
+        // Update springboards
+        mapManager.updateSpringboards();
 
         checkInteractions(); 
 
@@ -548,6 +580,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         // Reset breakable platforms on respawn
         mapManager.resetBreakablePlatforms();
+        
+        // Reset springboards on respawn
+        mapManager.resetSpringboards();
     }
 
     private void checkCollisionX() {
@@ -592,6 +627,22 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                         playerY = platform.y + platform.height;
                         velocityY = 0;
                     }
+                }
+            }
+        }
+        
+        // Check springboards
+        for (Springboard sb : mapManager.getSpringboards()) {
+            Rectangle springboard = sb.getBounds();
+            if (playerRect.intersects(springboard)) {
+                if (velocityY > 0) { 
+                    playerY = springboard.y - playerHeight;
+                    velocityY = -sb.getPropelHeight(); // Apply upward velocity based on propel height
+                    onGround = false; // Player is launched, not on ground
+                    sb.trigger(); // Trigger compression animation
+                } else if (velocityY < 0) {
+                    playerY = springboard.y + springboard.height;
+                    velocityY = 0;
                 }
             }
         }
@@ -665,6 +716,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // Reset breakable platforms
         mapManager.resetBreakablePlatforms();
         
+        // Reset springboards
+        mapManager.resetSpringboards();
+        
         if (activeBubbles != null) activeBubbles.clear();
         
         leftPressed = false;
@@ -679,6 +733,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         // Reset breakable platforms
         mapManager.resetBreakablePlatforms();
+        
+        // Reset springboards
+        mapManager.resetSpringboards();
         
         // 애니메이션 초기화
         isShowingStageName = true;

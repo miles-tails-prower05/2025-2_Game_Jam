@@ -12,6 +12,7 @@ public class MapManager {
     private ArrayList<Rectangle> platforms;
     private ArrayList<Rectangle> spikes;
     private ArrayList<BreakablePlatform> breakablePlatforms;
+    private ArrayList<Springboard> springboards;
     private int[] bubbleSpawnersX;
     private int levelWidth;
     
@@ -34,6 +35,7 @@ public class MapManager {
         platforms = new ArrayList<>();
         spikes = new ArrayList<>();
         breakablePlatforms = new ArrayList<>();
+        springboards = new ArrayList<>();
     }
 
     // 스테이지 이름을 받아 해당 파일을 로드
@@ -41,6 +43,7 @@ public class MapManager {
         platforms.clear();
         spikes.clear();
         breakablePlatforms.clear();
+        springboards.clear();
         goalObject = null;
         bubbleSpawnersX = new int[0]; // 초기화
 
@@ -109,6 +112,9 @@ public class MapManager {
                         Rectangle rect = parseRectangle(line);
                         breakablePlatforms.add(new BreakablePlatform(rect.x, rect.y, rect.width, rect.height));
                         break;
+                    case "SPRINGBOARDS":
+                        parseSpringboard(line);
+                        break;
                     case "SPIKES":
                         spikes.add(parseRectangle(line));
                         break;
@@ -169,10 +175,22 @@ public class MapManager {
         return new Rectangle(x, y, w, h);
     }
 
+    // "x, y, w, h, propelHeight" 문자열을 Springboard로 변환
+    private void parseSpringboard(String line) {
+        String[] parts = line.split(",");
+        int x = Integer.parseInt(parts[0].trim());
+        int y = Integer.parseInt(parts[1].trim());
+        int w = Integer.parseInt(parts[2].trim());
+        int h = Integer.parseInt(parts[3].trim());
+        double propelHeight = Double.parseDouble(parts[4].trim());
+        springboards.add(new Springboard(x, y, w, h, propelHeight));
+    }
+
     // --- Getters ---
     public ArrayList<Rectangle> getPlatforms() { return platforms; }
     public ArrayList<Rectangle> getSpikes() { return spikes; }
     public ArrayList<BreakablePlatform> getBreakablePlatforms() { return breakablePlatforms; }
+    public ArrayList<Springboard> getSpringboards() { return springboards; }
     public Rectangle getGoalObject() { return goalObject; }
     public int[] getBubbleSpawnersX() { return bubbleSpawnersX; }
     public int getLevelWidth() { return levelWidth; }
@@ -201,6 +219,24 @@ public class MapManager {
     public void resetBreakablePlatforms() {
         for (BreakablePlatform bp : breakablePlatforms) {
             bp.reset();
+        }
+    }
+    
+    /**
+     * Updates all springboards
+     */
+    public void updateSpringboards() {
+        for (Springboard sb : springboards) {
+            sb.update();
+        }
+    }
+    
+    /**
+     * Resets all springboards to their initial state
+     */
+    public void resetSpringboards() {
+        for (Springboard sb : springboards) {
+            sb.reset();
         }
     }
 }
