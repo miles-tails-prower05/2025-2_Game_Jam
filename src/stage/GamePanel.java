@@ -53,6 +53,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private int maxOxygen = 1000;
     private int currentOxygen = maxOxygen;
     private boolean isDead = false;
+    private int maxLives = 3;        // 최대 목숨
+    private int currentLives = 3;    // 현재 목숨
 
     // --- 동적 오브젝트 (공기 방울) ---
     private ArrayList<Bubble> activeBubbles; 
@@ -286,6 +288,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             return;
         }
 
+        // 1. 산소 게이지 표시 (기존 코드)
         if (mapManager.isUnderwater()) {
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 15));
@@ -297,15 +300,39 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             g.fillRect(50, 15, currentOxygen / 5, 20); 
             g.setColor(Color.WHITE);
             g.drawRect(50, 15, maxOxygen / 5, 20); 
-        } else {
+        }
+
+        // 2. 남은 목숨 표시 (추가된 부분)
+        // 위치: 산소 게이지 아래쪽
+        int lifeIconX = 20;
+        int lifeIconY = 50;
+        
+        // 캐릭터 얼굴 아이콘 (플레이어와 같은 파란색 사각형)
+        g.setColor(Color.BLUE);
+        g.fillRect(lifeIconX, lifeIconY, 30, 30);
+        g.setColor(Color.BLACK); // 테두리
+        g.drawRect(lifeIconX, lifeIconY, 30, 30);
+
+        // 남은 목숨 숫자
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 25));
+        g.drawString("x " + currentLives, lifeIconX + 40, lifeIconY + 25);
+        
+        // 스테이지 모드 표시 (위치를 조금 아래로 내림)
+        if (!mapManager.isUnderwater()) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Arial", Font.BOLD, 20));
-            g.drawString("STAGE MODE", 20, 30);
+            g.drawString("STAGE MODE", 20, 120);
         }
     }
 
     private void update() {
-        if (isDead) return;
+    	if (isDead) return;
+        
+        if (mapManager.isUnderwater()) {
+            currentOxygen--;
+            if (currentOxygen <= 0) handleDeath(); // [변경] 즉사 -> 목숨 차감
+        }
         
         if (mapManager.isUnderwater()) {
             currentOxygen--;
@@ -358,7 +385,27 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         cameraX = playerX - WINDOW_WIDTH / 2;
         if (cameraX < 0) cameraX = 0; 
         if (cameraX > mapManager.getLevelWidth() - WINDOW_WIDTH) 
-            cameraX = mapManager.getLevelWidth() - WINDOW_WIDTH; 
+            cameraX = mapManager.getLevelWidth() - WINDOW_WIDTH;
+    }
+        
+    // [수정] 사망 처리 로직 분리
+    private void handleDeath() {
+        currentLives--; // 목숨 감소
+        if (currentLives > 0) {
+            respawn(); // 목숨 남았으면 부활
+        } else {
+            isDead = true; // 목숨 없으면 게임 오버
+        }
+    }
+
+    // [추가] 리스폰(부활) 메서드: 위치와 상태만 초기화
+    private void respawn() {
+        playerX = 50;   // 시작 위치로 이동
+        playerY = 300;
+        velocityX = 0;
+        velocityY = 0;
+        currentOxygen = maxOxygen; // 산소 회복
+        // 필요한 경우 activeBubbles.clear(); 추가
     }
 
     private void checkCollisionX() {
@@ -372,6 +419,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
     }
 
+    // [수정] checkCollisionY: 낙사 시 handleDeath 호출
     private void checkCollisionY() {
         Rectangle playerRect = new Rectangle(playerX, playerY, playerWidth, playerHeight);
         for (Rectangle platform : mapManager.getPlatforms()) {
@@ -386,13 +434,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 }
             }
         }
-        if (playerY > WINDOW_HEIGHT) isDead = true; 
+        // 화면 아래로 떨어지면 사망 처리
+        if (playerY > WINDOW_HEIGHT) handleDeath(); 
     }
 
+    // [수정] checkInteractions: 가시 닿으면 handleDeath 호출
     private void checkInteractions() {
         Rectangle playerRect = new Rectangle(playerX, playerY, playerWidth, playerHeight);
         for (Rectangle spike : mapManager.getSpikes()) {
-            if (playerRect.intersects(spike)) isDead = true; 
+            if (playerRect.intersects(spike)) {
+                handleDeath(); 
+                return; // 한 번 닿으면 즉시 처리하고 반환 (중복 호출 방지)
+            }
         }
     }
 
@@ -429,13 +482,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         // 필수 구현 메서드 (비워둠)
     }
 
+    // [수정] resetGame: 게임 완전 재시작 시 목숨도 초기화
     private void resetGame() {
-        playerX = 50;
-        playerY = 300;
-        velocityX = 0;
-        velocityY = 0;
-        currentOxygen = maxOxygen;
+        currentLives = maxLives; // 목숨 초기화
+        respawn();               // 위치 초기화
         isDead = false;
+        
         if (activeBubbles != null) activeBubbles.clear();
         
         leftPressed = false;
@@ -444,16 +496,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         jumpLocked = false;
     }
     
+    // [수정] 스테이지 변경 시에도 리셋 적용
     public void changeStage(String stage) {
         mapManager.loadLevel(stage);
         
-        // 스테이지 바뀔 때 리셋
-        playerX = 50;
-        playerY = 300;
-        velocityX = 0;
-        velocityY = 0;
-        currentOxygen = maxOxygen;
+        currentLives = maxLives; // 새 스테이지에서는 목숨 초기화
+        respawn();
         isDead = false;
+        
         if (activeBubbles != null) activeBubbles.clear();
 
         if (mapManager.isUnderwater()) setBackground(new Color(0, 100, 0)); 
