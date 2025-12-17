@@ -35,6 +35,10 @@ friction=0.95
 1000, 520, 100, 30
 1600, 520, 300, 30
 
+[SPRINGBOARDS]
+# x, y, width, height, propelHeight
+1800, 530, 100, 20, 18.0
+
 [BUBBLE_SPAWNERS]
 # x coordinates
 250, 650, 1200, 1800, 2400

@@ -27,6 +27,10 @@ friction=0.8
 [SPIKES]
 600, 570, 100, 30
 
+[SPRINGBOARDS]
+# x, y, width, height, propelHeight
+900, 580, 80, 20, 15.0
+
 [BUBBLE_SPAWNERS]
 # 없음
 
