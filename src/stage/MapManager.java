@@ -183,6 +183,7 @@ public class MapManager {
         else if (key.equals("spikeColor")) stageColors.setSpikeColor(value);
         else if (key.equals("breakablePlatformColor")) stageColors.setBreakablePlatformColor(value);
         else if (key.equals("springboardColor")) stageColors.setSpringboardColor(value);
+        else if (key.equals("backgroundColor")) stageColors.setBackgroundColor(value);
     }
 
     // "x, y, w, h" 문자열을 Rectangle로 변환

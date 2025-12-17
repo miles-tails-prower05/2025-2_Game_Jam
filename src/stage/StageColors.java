@@ -18,6 +18,7 @@ public class StageColors {
     private Color spikeColor;
     private Color breakablePlatformColor;
     private Color springboardColor;
+    private Color backgroundColor = Color.BLACK; 
     
     public StageColors() {
         // Initialize with defaults
@@ -98,6 +99,13 @@ public class StageColors {
         }
     }
     
+    public void setBackgroundColor(String colorStr) {
+        Color parsed = parseColor(colorStr);
+        if (parsed != null) {
+            this.backgroundColor = parsed;
+        }
+    }
+    
     // Getters - always return a valid color
     public Color getPlatformColor() {
         return platformColor;
@@ -113,5 +121,9 @@ public class StageColors {
     
     public Color getSpringboardColor() {
         return springboardColor;
+    }
+    
+    public Color getBackgroundColor() {
+        return backgroundColor != null ? backgroundColor : Color.BLACK;
     }
 }

@@ -17,6 +17,7 @@ platformColor=#ffd700
 spikeColor=#808080
 breakablePlatformColor=#654321
 springboardColor=#DAA520
+backgroundColor=#38c5f8
 
 [PLATFORMS]
 # x, y, width, height

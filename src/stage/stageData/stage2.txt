@@ -13,10 +13,11 @@ friction=0.9
 [COLORS]
 # Hex format: #RRGGBB or RGB format: R,G,B
 # If not specified, default colors will be used
-platformColor=#008080
+platformColor=#5d7869
 spikeColor=#778899
 breakablePlatformColor=#00ced1
 springboardColor=#f5fffa
+backgroundColor=#c0f6e3
 
 [PLATFORMS]
 # x, y, width, height

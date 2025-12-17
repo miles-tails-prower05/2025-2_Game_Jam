@@ -215,6 +215,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
+        
+        if (mapManager != null && mapManager.getStageColors() != null) {
+            g.setColor(mapManager.getStageColors().getBackgroundColor());
+            g.fillRect(0, 0, getWidth(), getHeight());
+        } else {
+            g.setColor(Color.BLACK); // 기본값
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
 
         AffineTransform originalTransform = g2d.getTransform(); 
         g2d.translate(-cameraX, 0); 
