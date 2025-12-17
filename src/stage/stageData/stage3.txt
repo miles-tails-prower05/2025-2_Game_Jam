@@ -1,12 +1,21 @@
 [MAP_INFO]
 levelWidth=3500
 isUnderwater=true
+spawnX=50
+spawnY=550
 
 [PHYSICS]
 gravity=0.35
 jumpStrength=-9.5
 speed=6.0
 friction=0.9
+
+[COLORS]
+# RGB format for underwater stage theme
+platformColor=70,130,180
+spikeColor=255,69,0
+breakablePlatformColor=100,149,237
+springboardColor=0,191,255
 
 [PLATFORMS]
 # x, y, width, height

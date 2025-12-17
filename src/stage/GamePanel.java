@@ -243,17 +243,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         // 플랫폼
-        g.setColor(new Color(180, 100, 50));
+        Color platformColor = mapManager.getStageColors().getPlatformColor();
+        g.setColor(platformColor);
         for (Rectangle platform : mapManager.getPlatforms()) {
             if (platform.x + platform.width > cameraX && platform.x < cameraX + WINDOW_WIDTH) {
                 g.fillRect(platform.x, platform.y, platform.width, platform.height);
                 g.setColor(Color.BLACK);
                 g.drawRect(platform.x, platform.y, platform.width, platform.height);
-                g.setColor(new Color(180, 100, 50)); 
+                g.setColor(platformColor); 
             }
         }
         
         // 부서지는 플랫폼
+        Color breakableColor = mapManager.getStageColors().getBreakablePlatformColor();
         for (BreakablePlatform bp : mapManager.getBreakablePlatforms()) {
             Rectangle platform = bp.getBounds();
             if (platform.x + platform.width > cameraX && platform.x < cameraX + WINDOW_WIDTH) {
@@ -266,8 +268,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                         shakeOffset = (bp.getBreakTimer() % 4 < 2) ? intensity : -intensity;
                     }
                     
-                    // Draw platform with different color to indicate it's breakable
-                    g.setColor(new Color(150, 80, 40)); // Darker brown
+                    // Draw platform with stage-specific color
+                    g.setColor(breakableColor);
                     g.fillRect(platform.x, platform.y + shakeOffset, platform.width, platform.height);
                     
                     // Draw cracks pattern when triggered
@@ -290,6 +292,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         // 스프링보드
+        Color springboardColor = mapManager.getStageColors().getSpringboardColor();
         for (Springboard sb : mapManager.getSpringboards()) {
             Rectangle springboard = sb.getBounds();
             if (springboard.x + springboard.width > cameraX && springboard.x < cameraX + WINDOW_WIDTH) {
@@ -300,8 +303,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     //compressionOffset = (sb.getCompressionTimer() * 5) / sb.getCompressionDuration();
                 //}
                 
-                // Draw springboard with slightly lighter brown to distinguish from regular platforms
-                g.setColor(new Color(200, 120, 60)); // Lighter brown than regular platforms
+                // Draw springboard with stage-specific color
+                g.setColor(springboardColor);
                 g.fillRect(springboard.x, springboard.y + compressionOffset, springboard.width, springboard.height - compressionOffset);
                 
                 // Add spring coil pattern to make it identifiable
@@ -319,7 +322,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         }
 
         // 가시
-        g.setColor(Color.LIGHT_GRAY);
+        Color spikeColor = mapManager.getStageColors().getSpikeColor();
+        g.setColor(spikeColor);
         for (Rectangle spike : mapManager.getSpikes()) {
             if (spike.x + spike.width > cameraX && spike.x < cameraX + WINDOW_WIDTH) {
                 int[] xPoints = {spike.x, spike.x + spike.width/2, spike.x + spike.width};

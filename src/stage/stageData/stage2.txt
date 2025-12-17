@@ -10,6 +10,14 @@ jumpStrength=-12.0
 speed=8.0
 friction=0.8
 
+[COLORS]
+# Hex format: #RRGGBB or RGB format: R,G,B
+# If not specified, default colors will be used
+platformColor=#8B4513
+spikeColor=#FF4444
+breakablePlatformColor=#654321
+springboardColor=#DAA520
+
 [PLATFORMS]
 # x, y, width, height
 0, 600, 2000, 200
