@@ -67,7 +67,7 @@ public class MapManager {
             fileName = "stage5.txt";
         } else if (stageName.equals("Rival Battle")) {
             fileName = "stage6.txt";
-        } else if (stageName.equals("스테이지 7")) {
+        } else if (stageName.equals("Remote Island")) {
             fileName = "stage7.txt";
         } else {
             System.out.println("알 수 없는 스테이지: " + stageName);

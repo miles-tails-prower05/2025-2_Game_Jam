@@ -498,7 +498,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     } else if ("Labyrinth".equals(currentStageName)) {
                         changeStage("Rival Battle");
                     } else if ("Rival Battle".equals(currentStageName)) {
-                        changeStage("스테이지 7");
+                        changeStage("Remote Island");
                     } else {
                         cards.show(frame, "TITLE");
                     }

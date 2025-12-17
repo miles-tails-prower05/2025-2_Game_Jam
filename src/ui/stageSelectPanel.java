@@ -63,7 +63,7 @@ public class stageSelectPanel extends JPanel {
         addStageListener(stage4Btn, "Deep Water");
         addStageListener(stage5Btn, "Labyrinth");
         addStageListener(stage6Btn, "Rival Battle");
-        addStageListener(stage7Btn, "스테이지 7");
+        addStageListener(stage7Btn, "Remote Island");
         
         // 3. 타이틀로 가기 버튼 (추가된 부분)
         backToTitleBtn = new JButton("타이틀로 가기");
@@ -118,7 +118,7 @@ public class stageSelectPanel extends JPanel {
         long time4 = saveManager.getBestTime("Deep Water");
         long time5 = saveManager.getBestTime("Labyrinth");
         long time6 = saveManager.getBestTime("Rival Battle");
-        long time7 = saveManager.getBestTime("스테이지 7");
+        long time7 = saveManager.getBestTime("Remote Island");
         
         stage1Btn.setText(formatButtonText("스테이지 1: Gold Coast", time1));
         stage2Btn.setText(formatButtonText("스테이지 2: Emerald Sea", time2));
@@ -126,7 +126,7 @@ public class stageSelectPanel extends JPanel {
         stage4Btn.setText(formatButtonText("스테이지 4: Deep Water", time4));
         stage5Btn.setText(formatButtonText("스테이지 5: Labyrinth", time5));
         stage6Btn.setText(formatButtonText("스테이지 6: Rival Battle", time6));
-        stage7Btn.setText(formatButtonText("스테이지 7: 외딴 섬", time7));
+        stage7Btn.setText(formatButtonText("스테이지 7: Remote Island", time7));
     }
     
     // ★ HTML 태그를 사용하여 멀티라인 텍스트 만들기
