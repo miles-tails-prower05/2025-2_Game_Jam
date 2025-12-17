@@ -12,10 +12,11 @@ friction=0.9
 
 [COLORS]
 # RGB format for underwater stage theme
-platformColor=70,130,180
-spikeColor=255,69,0
-breakablePlatformColor=100,149,237
-springboardColor=0,191,255
+platformColor=#7e5b2a
+spikeColor=#736650
+breakablePlatformColor=#c1a36f
+springboardColor=#e2ddd4
+backgroundColor=#3e290c
 
 [PLATFORMS]
 # x, y, width, height

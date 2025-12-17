@@ -59,7 +59,7 @@ public class MapManager {
             fileName = "stage1.txt";
         } else if (stageName.equals("Emerald Sea")) {
             fileName = "stage2.txt";
-        } else if (stageName.equals("스테이지 3")) {
+        } else if (stageName.equals("Shattered Wreckage")) {
             fileName = "stage3.txt";
         } else if (stageName.equals("스테이지 4")) {
             fileName = "stage4.txt";

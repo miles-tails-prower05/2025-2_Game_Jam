@@ -59,7 +59,7 @@ public class stageSelectPanel extends JPanel {
         // Add action listeners using helper method
         addStageListener(stage1Btn, "Gold Coast");
         addStageListener(stage2Btn, "Emerald Sea");
-        addStageListener(stage3Btn, "스테이지 3");
+        addStageListener(stage3Btn, "Shattered Wreckage");
         addStageListener(stage4Btn, "스테이지 4");
         addStageListener(stage5Btn, "스테이지 5");
         addStageListener(stage6Btn, "스테이지 6");
@@ -114,7 +114,7 @@ public class stageSelectPanel extends JPanel {
     private void updateButtonText() {
         long time1 = saveManager.getBestTime("Gold Coast");
         long time2 = saveManager.getBestTime("Emerald Sea");
-        long time3 = saveManager.getBestTime("스테이지 3");
+        long time3 = saveManager.getBestTime("Shattered Wreckage");
         long time4 = saveManager.getBestTime("스테이지 4");
         long time5 = saveManager.getBestTime("스테이지 5");
         long time6 = saveManager.getBestTime("스테이지 6");
@@ -122,7 +122,7 @@ public class stageSelectPanel extends JPanel {
         
         stage1Btn.setText(formatButtonText("스테이지 1: Gold Coast", time1));
         stage2Btn.setText(formatButtonText("스테이지 2: Emerald Sea", time2));
-        stage3Btn.setText(formatButtonText("스테이지 3: 난파선", time3));
+        stage3Btn.setText(formatButtonText("스테이지 3: Shattered Wreckage", time3));
         stage4Btn.setText(formatButtonText("스테이지 4: 심해", time4));
         stage5Btn.setText(formatButtonText("스테이지 5: 수중 미로", time5));
         stage6Btn.setText(formatButtonText("스테이지 6: 평행 세계", time6));
