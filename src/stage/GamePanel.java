@@ -115,7 +115,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         initPausePanel();
 
-        changeStage("스테이지 1");
+        changeStage("Gold Coast");
         activeBubbles = new ArrayList<>();
         
         timer = new Timer(DELAY, this);

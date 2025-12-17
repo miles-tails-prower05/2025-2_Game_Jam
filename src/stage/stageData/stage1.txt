@@ -10,6 +10,14 @@ jumpStrength=-9.0
 speed=5.0
 friction=0.95
 
+[COLORS]
+# Hex format: #RRGGBB or RGB format: R,G,B
+# If not specified, default colors will be used
+platformColor=#ffd700
+spikeColor=#808080
+breakablePlatformColor=#654321
+springboardColor=#DAA520
+
 [PLATFORMS]
 # x, y, width, height
 # 시작 지점 (안전지대)

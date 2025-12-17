@@ -27,8 +27,17 @@ public class titlePanel extends JPanel {
         setLayout(null); // 자유로운 배치를 위해 null 레이아웃 사용
         setBackground(Color.BLACK); // 이미지가 없을 경우를 대비한 배경색
 
-        // 배경 이미지 로드 (프로젝트 폴더에 'title_bg.png'가 있다면 사용)
-        // backgroundImage = new ImageIcon("title_bg.png").getImage();
+        // 배경 이미지 로드
+        try {
+            java.net.URL imgUrl = getClass().getResource("/ui/images/title_bg.png");
+            if (imgUrl != null) {
+                backgroundImage = new ImageIcon(imgUrl).getImage();
+            } else {
+                System.err.println("타이틀 배경 이미지를 찾을 수 없습니다:  /ui/images/title_bg.png");
+            }
+        } catch (Exception ex) {
+            System.err.println("타이틀 배경 이미지 로드 오류: " + ex. getMessage());
+        }
 
         // 1. 게임 시작 버튼
         startButton = new JButton("게임 시작");
