@@ -10,14 +10,17 @@ public class titlePanel extends JPanel {
     private JButton startButton;
     private JButton storyButton;
     private JButton stageSelectButton;
+    
     private CardLayout cards;
     private Container frame;
     private GamePanel gamePanel;
+    private eventScenePanel eventPanel;
 
-    public titlePanel(Container frame, CardLayout cards, GamePanel gamePanel) {
+    public titlePanel(Container frame, CardLayout cards, GamePanel gamePanel, eventScenePanel eventPanel) {
         this.frame = frame;
         this.cards = cards;
         this.gamePanel = gamePanel;
+        this.eventPanel = eventPanel;
         
         // 화면 크기 고정 (GamePanel과 동일하게)
         setPreferredSize(new Dimension(1280, 720));
@@ -53,11 +56,11 @@ public class titlePanel extends JPanel {
             repaint();
         });
 
-        // '스토리 진행' 클릭 시 -> 바로 1스테이지 시작
+        // '스토리 진행' 클릭 시 -> 컷씬 재생 후 1스테이지 시작
         storyButton.addActionListener(e -> {
         	gamePanel.setStoryMode(true);
             gamePanel.changeStage("스테이지 1");
-            cards.show(frame, "GAME");
+            eventPanel.startCutscene("intro_script.txt", "GAME");
             gamePanel.requestFocus(); // 키 입력을 받기 위해 포커스 요청 필수
         });
 

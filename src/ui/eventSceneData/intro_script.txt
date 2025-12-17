@@ -1,0 +1,4 @@
+# 인트로 스크립트 예제
+scene_bg_01.png|face_hero.png|주인공|여기가 어디지...? 어두워서 아무것도 안 보여.
+scene_bg_01.png|face_unknown.png|???|거기 누구냐!
+scene_bg_02.png|face_hero.png|주인공|누구세요? 모습을 드러내세요!

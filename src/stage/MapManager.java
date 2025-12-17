@@ -2,6 +2,10 @@ package stage;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
 
 public class MapManager {
     // 맵 구조 데이터
@@ -10,7 +14,7 @@ public class MapManager {
     private int[] bubbleSpawnersX;
     private int levelWidth;
     
-    // ★ 클리어 오브젝트 (조개 조각)
+    // ★ 클리어 오브젝트
     private Rectangle goalObject;
 
     // ★ 물리 엔진 설정값
@@ -27,80 +31,126 @@ public class MapManager {
         spikes = new ArrayList<>();
     }
 
-    public void loadLevel(String stage) {
+    // 스테이지 이름을 받아 해당 파일을 로드
+    public void loadLevel(String stageName) {
         platforms.clear();
         spikes.clear();
-        goalObject = null; // 초기화
+        goalObject = null;
+        bubbleSpawnersX = new int[0]; // 초기화
+
+        String fileName = "";
         
-        if (stage == "스테이지 1") {
-            initStage1_Labyrinth();
-        } else if (stage == "스테이지 2") {
-            initStage2_GreenHill();
+        // 스테이지 이름에 따른 파일명 매핑
+        if (stageName.equals("스테이지 1")) {
+            fileName = "stage1.txt";
+        } else if (stageName.equals("스테이지 2")) {
+            fileName = "stage2.txt";
+        } else {
+            System.out.println("알 수 없는 스테이지: " + stageName);
+            return;
+        }
+
+        parseStageFile(fileName);
+    }
+
+    private void parseStageFile(String fileName) {
+        ArrayList<Integer> bubbleList = new ArrayList<>();
+        
+        try {
+            // src/stage/stageData/ 폴더에서 파일 읽기
+            InputStream is = getClass().getResourceAsStream("/stage/stageData/" + fileName);
+            if (is == null) {
+                System.out.println("스테이지 파일을 찾을 수 없습니다: " + fileName);
+                return;
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String line;
+            String currentSection = "";
+
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) continue; // 공백이나 주석 무시
+
+                // 섹션 헤더 파싱 (예: [MAP_INFO])
+                if (line.startsWith("[") && line.endsWith("]")) {
+                    currentSection = line.substring(1, line.length() - 1);
+                    continue;
+                }
+
+                // 섹션별 데이터 처리
+                switch (currentSection) {
+                    case "MAP_INFO":
+                        parseMapInfo(line);
+                        break;
+                    case "PHYSICS":
+                        parsePhysics(line);
+                        break;
+                    case "PLATFORMS":
+                        platforms.add(parseRectangle(line));
+                        break;
+                    case "SPIKES":
+                        spikes.add(parseRectangle(line));
+                        break;
+                    case "BUBBLE_SPAWNERS":
+                        // 쉼표로 구분된 x좌표들 파싱
+                        String[] parts = line.split(",");
+                        for (String s : parts) {
+                            bubbleList.add(Integer.parseInt(s.trim()));
+                        }
+                        break;
+                    case "GOAL":
+                        goalObject = parseRectangle(line);
+                        break;
+                }
+            }
+            br.close();
+            
+            // 버블 스포너 리스트를 배열로 변환
+            bubbleSpawnersX = bubbleList.stream().mapToInt(i -> i).toArray();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    // 스테이지 1: 레버린스 존
-    private void initStage1_Labyrinth() {
-        levelWidth = 3000;
-        
-        gravity = 0.3;
-        jumpStrength = -9.0;
-        speed = 5.0;
-        friction = 0.95;
-        isUnderwater = true;
+    // "key=value" 형태 파싱
+    private void parseMapInfo(String line) {
+        String[] parts = line.split("=");
+        if (parts.length < 2) return;
+        String key = parts[0].trim();
+        String value = parts[1].trim();
 
-        platforms.add(new Rectangle(0, 550, levelWidth, 200)); 
-        platforms.add(new Rectangle(-50, 0, 50, 720)); 
-        platforms.add(new Rectangle(levelWidth, 0, 50, 720)); 
-
-        platforms.add(new Rectangle(200, 450, 100, 20)); 
-        platforms.add(new Rectangle(400, 350, 100, 20)); 
-        platforms.add(new Rectangle(700, 300, 100, 20));
-        platforms.add(new Rectangle(900, 400, 100, 20));
-        platforms.add(new Rectangle(1100, 250, 150, 20));
-        platforms.add(new Rectangle(1500, 400, 80, 20));
-        platforms.add(new Rectangle(2300, 450, 200, 20)); 
-
-        spikes.add(new Rectangle(300, 520, 100, 30)); 
-        spikes.add(new Rectangle(1000, 520, 100, 30)); 
-        spikes.add(new Rectangle(1600, 520, 300, 30)); 
-
-        bubbleSpawnersX = new int[]{250, 650, 1200, 1800, 2400};
-        
-        // ★ 조개 조각 배치 (스테이지 끝부분)
-        goalObject = new Rectangle(2850, 500, 40, 40);
+        if (key.equals("levelWidth")) levelWidth = Integer.parseInt(value);
+        else if (key.equals("isUnderwater")) isUnderwater = Boolean.parseBoolean(value);
     }
 
-    // 스테이지 2: 그린 힐
-    private void initStage2_GreenHill() {
-        levelWidth = 2000;
+    private void parsePhysics(String line) {
+        String[] parts = line.split("=");
+        if (parts.length < 2) return;
+        String key = parts[0].trim();
+        String value = parts[1].trim();
 
-        gravity = 0.6;
-        jumpStrength = -12.0;
-        speed = 8.0;
-        friction = 0.8;
-        isUnderwater = false;
+        if (key.equals("gravity")) gravity = Double.parseDouble(value);
+        else if (key.equals("jumpStrength")) jumpStrength = Double.parseDouble(value);
+        else if (key.equals("speed")) speed = Double.parseDouble(value);
+        else if (key.equals("friction")) friction = Double.parseDouble(value);
+    }
 
-        platforms.add(new Rectangle(0, 600, levelWidth, 200));
-        platforms.add(new Rectangle(-50, 0, 50, 720));
-        platforms.add(new Rectangle(levelWidth, 0, 50, 720));
-        
-        platforms.add(new Rectangle(300, 500, 100, 20));
-        platforms.add(new Rectangle(500, 400, 100, 20));
-        platforms.add(new Rectangle(700, 300, 100, 20));
-        
-        spikes.add(new Rectangle(600, 570, 100, 30));
-
-        bubbleSpawnersX = new int[]{}; 
-        
-        // ★ 조개 조각 배치
-        goalObject = new Rectangle(1900, 550, 40, 40);
+    // "x, y, w, h" 문자열을 Rectangle로 변환
+    private Rectangle parseRectangle(String line) {
+        String[] parts = line.split(",");
+        int x = Integer.parseInt(parts[0].trim());
+        int y = Integer.parseInt(parts[1].trim());
+        int w = Integer.parseInt(parts[2].trim());
+        int h = Integer.parseInt(parts[3].trim());
+        return new Rectangle(x, y, w, h);
     }
 
     // --- Getters ---
     public ArrayList<Rectangle> getPlatforms() { return platforms; }
     public ArrayList<Rectangle> getSpikes() { return spikes; }
-    public Rectangle getGoalObject() { return goalObject; } // 추가됨
+    public Rectangle getGoalObject() { return goalObject; }
     public int[] getBubbleSpawnersX() { return bubbleSpawnersX; }
     public int getLevelWidth() { return levelWidth; }
     

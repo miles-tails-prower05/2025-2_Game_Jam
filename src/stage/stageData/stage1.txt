@@ -1,0 +1,36 @@
+[MAP_INFO]
+levelWidth=3000
+isUnderwater=true
+
+[PHYSICS]
+gravity=0.3
+jumpStrength=-9.0
+speed=5.0
+friction=0.95
+
+[PLATFORMS]
+# x, y, width, height
+0, 550, 3000, 200
+-50, 0, 50, 720
+3000, 0, 50, 720
+200, 450, 100, 20
+400, 350, 100, 20
+700, 300, 100, 20
+900, 400, 100, 20
+1100, 250, 150, 20
+1500, 400, 80, 20
+2300, 450, 200, 20
+
+[SPIKES]
+# x, y, width, height
+300, 520, 100, 30
+1000, 520, 100, 30
+1600, 520, 300, 30
+
+[BUBBLE_SPAWNERS]
+# x coordinates
+250, 650, 1200, 1800, 2400
+
+[GOAL]
+# x, y, width, height
+2850, 500, 40, 40

@@ -1,4 +1,7 @@
 import javax.swing.*;
+
+import data.SaveManager;
+
 import java.awt.*;
 import stage.*;
 import ui.*;
@@ -9,15 +12,22 @@ public class GameMain {
         final CardLayout cards = new CardLayout();
         frame.setLayout(cards);
         
+        SaveManager saveManager = new SaveManager();
+        
+        // 4. 이벤트 컷씬 패널 생성
+        eventScenePanel eventPanel = new eventScenePanel(frame.getContentPane(), cards);
+        frame.add(eventPanel, "CUTSCENE"); // "CUTSCENE"이라는 이름으로 등록
+        
         // 1. 게임 패널 생성 (기본값 스테이지 1)
         // 화면 전환 시 Timer 제어를 위해 GamePanel의 addComponentListener 코드가 잘 동작할 것입니다.
-        GamePanel gamePanel = new GamePanel(frame.getContentPane(), cards, "스테이지 1");
+        GamePanel gamePanel = new GamePanel(frame.getContentPane(), cards, eventPanel, saveManager);
         
         // 2. 타이틀 패널 생성
-        titlePanel title = new titlePanel(frame.getContentPane(), cards, gamePanel);
+        titlePanel title = new titlePanel(frame.getContentPane(), cards, gamePanel, eventPanel);
         
         // 3. 스테이지 선택 패널 생성
-        stageSelectPanel stageSelect = new stageSelectPanel(frame.getContentPane(), cards, gamePanel);
+        stageSelectPanel stageSelect = new stageSelectPanel(frame.getContentPane(), cards, gamePanel, saveManager);
+        
         
         // 카드 레이아웃에 패널 추가 (이름표 부여)
         frame.add(title, "TITLE");        // 타이틀 화면

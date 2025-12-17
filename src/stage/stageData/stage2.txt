@@ -1,0 +1,27 @@
+[MAP_INFO]
+levelWidth=2000
+isUnderwater=false
+
+[PHYSICS]
+gravity=0.6
+jumpStrength=-12.0
+speed=8.0
+friction=0.8
+
+[PLATFORMS]
+# x, y, width, height
+0, 600, 2000, 200
+-50, 0, 50, 720
+2000, 0, 50, 720
+300, 500, 100, 20
+500, 400, 100, 20
+700, 300, 100, 20
+
+[SPIKES]
+600, 570, 100, 30
+
+[BUBBLE_SPAWNERS]
+# 없음
+
+[GOAL]
+1900, 550, 40, 40

@@ -1,6 +1,10 @@
 package stage;
 
 import javax.swing.*;
+
+import data.SaveManager;
+import ui.eventScenePanel;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
@@ -12,7 +16,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     // --- 카드 레이아웃 관련 ---
     private Container frame;
     private CardLayout cards;
-    private String panel; 
+    private eventScenePanel eventPanel;
     
     // 현재 스테이지 이름 저장용 변수
     private String currentStageName; 
@@ -32,6 +36,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     
     // --- MapManager ---
     private MapManager mapManager;
+    
+    private SaveManager saveManager;
 
     // --- 카메라 ---
     private int cameraX = 0;
@@ -57,6 +63,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private boolean isDead = false;
     private int maxLives = 3;
     private int currentLives = 3;
+    private long currentPlayTime = 0;
 
     // --- 클리어 상태 ---
     private boolean isCleared = false;
@@ -81,7 +88,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         public Rectangle getBounds() { return new Rectangle(x, y, size, size); }
     }
 
-    public GamePanel(Container frame, CardLayout cards, String panel) {
+    public GamePanel(Container frame, CardLayout cards, eventScenePanel eventPanel, SaveManager saveManager) {
         setLayout(null);
         
         setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
@@ -92,7 +99,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         mapManager = new MapManager();
         this.frame = frame;
         this.cards = cards;
-        this.panel = panel;
+        this.eventPanel = eventPanel;
+        this.saveManager = saveManager;
 
         menuButton = new JButton("MENU");
         menuButton.setBounds(WINDOW_WIDTH - 100, 20, 80, 40);
@@ -102,7 +110,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         initPausePanel();
 
-        changeStage(this.panel);
+        changeStage("스테이지 1");
         activeBubbles = new ArrayList<>();
         
         timer = new Timer(DELAY, this);
@@ -283,6 +291,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     }
 
     private void drawUI(Graphics2D g) {
+    	// ★ 추가: 현재 경과 시간 표시 (우측 상단)
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        String timeStr = formatTime(currentPlayTime);
+        g.drawString("Time: " + timeStr, WINDOW_WIDTH - 200, 80);
+    	
         if (isDead) {
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 40));
@@ -312,6 +326,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             int msgX = (WINDOW_WIDTH - fm.stringWidth(msg)) / 2;
             int msgY = WINDOW_HEIGHT / 2;
             g.drawString(msg, msgX, msgY);
+
+            // ★ 추가: 클리어 화면에 기록 표시
+            String clearTimeStr = "Clear Time: " + formatTime(currentPlayTime);
+            g.setFont(new Font("Malgun Gothic", Font.BOLD, 30));
+            FontMetrics fm1 = g.getFontMetrics();
+            int timeX = (WINDOW_WIDTH - fm1.stringWidth(clearTimeStr)) / 2;
+            g.drawString(clearTimeStr, timeX, WINDOW_HEIGHT / 2 + 60); // "클리어 했습니다" 아래에 표시
             return;
         }
 
@@ -326,6 +347,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 25));
         g.drawString("x " + (currentLives-1), lifeIconX + 40, lifeIconY + 25);
+    }
+    
+    // ★ 추가: 시간을 "분:초.밀리초" 형식으로 변환하는 헬퍼 메서드
+    private String formatTime(long millis) {
+        long minutes = (millis / 1000) / 60;
+        long seconds = (millis / 1000) % 60;
+        long hund = (millis / 10) % 100; // 10ms 단위
+        return String.format("%02d:%02d.%02d", minutes, seconds, hund);
     }
 
     private void update() {
@@ -346,6 +375,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             }
             return; 
         }
+        
+        currentPlayTime += DELAY;
 
         if (mapManager.isUnderwater()) {
             currentOxygen--; 
@@ -463,6 +494,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (!isCleared) {
                 isCleared = true;
                 clearDelayTimer = 0;
+                
+                // ★ 추가: 클리어 시 기록 저장
+                // 스토리 모드가 아닐 때만 기록하거나, 둘 다 기록하거나 선택 가능. 여기선 모두 기록.
+               saveManager.setBestTime(currentStageName, currentPlayTime);
             }
         }
     }
@@ -505,6 +540,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         isDead = false;
         isCleared = false; 
         clearDelayTimer = 0;
+        currentPlayTime = 0;
         
         if (activeBubbles != null) activeBubbles.clear();
         
@@ -528,5 +564,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         if (mapManager.isUnderwater()) setBackground(new Color(0, 100, 0)); 
         else setBackground(new Color(135, 206, 235));
+        
+        currentPlayTime = 0;
     }
 }
