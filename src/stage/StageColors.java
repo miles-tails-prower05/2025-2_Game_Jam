@@ -52,11 +52,18 @@ public class StageColors {
                     int r = Integer.parseInt(parts[0].trim());
                     int g = Integer.parseInt(parts[1].trim());
                     int b = Integer.parseInt(parts[2].trim());
+                    
+                    // Validate RGB values are in range 0-255
+                    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+                        System.out.println("Invalid color format: " + colorStr + ". RGB values must be between 0-255.");
+                        return null;
+                    }
+                    
                     return new Color(r, g, b);
                 }
             }
         } catch (Exception e) {
-            System.out.println("Failed to parse color: " + colorStr);
+            System.out.println("Invalid color format: " + colorStr + ". Expected formats: #RRGGBB or R,G,B");
         }
         
         return null;
@@ -91,20 +98,20 @@ public class StageColors {
         }
     }
     
-    // Getters - always return a valid color (default if not set)
+    // Getters - always return a valid color
     public Color getPlatformColor() {
-        return platformColor != null ? platformColor : DEFAULT_PLATFORM_COLOR;
+        return platformColor;
     }
     
     public Color getSpikeColor() {
-        return spikeColor != null ? spikeColor : DEFAULT_SPIKE_COLOR;
+        return spikeColor;
     }
     
     public Color getBreakablePlatformColor() {
-        return breakablePlatformColor != null ? breakablePlatformColor : DEFAULT_BREAKABLE_PLATFORM_COLOR;
+        return breakablePlatformColor;
     }
     
     public Color getSpringboardColor() {
-        return springboardColor != null ? springboardColor : DEFAULT_SPRINGBOARD_COLOR;
+        return springboardColor;
     }
 }
