@@ -120,7 +120,7 @@ public class RegressionTest {
         if (passed) {
             System.out.println("  ✓ Underwater settings preserved");
             System.out.println("    Stage 1: underwater = " + stage1Underwater);
-            System.out.println("    Stage 2: underwater = " + !stage2NotUnderwater);
+            System.out.println("    Stage 2: underwater = " + mm2.isUnderwater());
         } else {
             System.out.println("  ✗ Underwater settings not preserved correctly");
         }
