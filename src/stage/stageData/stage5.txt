@@ -1,12 +1,21 @@
 [MAP_INFO]
 levelWidth=4500
 isUnderwater=true
+spawnX=50
+spawnY=600
 
 [PHYSICS]
 gravity=0.3
 jumpStrength=-9.0
 speed=5.5
 friction=0.92
+
+[COLORS]
+# Maze theme - mysterious deep sea
+platformColor=47,79,79
+spikeColor=255,20,147
+breakablePlatformColor=25,25,112
+springboardColor=65,105,225
 
 [PLATFORMS]
 # x, y, width, height

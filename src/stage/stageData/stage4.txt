@@ -1,12 +1,21 @@
 [MAP_INFO]
 levelWidth=4000
 isUnderwater=true
+spawnX=50
+spawnY=600
 
 [PHYSICS]
 gravity=0.25
 jumpStrength=-8.0
 speed=5.0
 friction=0.95
+
+[COLORS]
+# Deep ocean theme with darker colors
+platformColor=#2F4F4F
+spikeColor=#DC143C
+breakablePlatformColor=#1C3A5C
+springboardColor=#4169E1
 
 [PLATFORMS]
 # x, y, width, height
