@@ -51,6 +51,16 @@ public class MapManager {
             fileName = "stage1.txt";
         } else if (stageName.equals("스테이지 2")) {
             fileName = "stage2.txt";
+        } else if (stageName.equals("스테이지 3")) {
+            fileName = "stage3.txt";
+        } else if (stageName.equals("스테이지 4")) {
+            fileName = "stage4.txt";
+        } else if (stageName.equals("스테이지 5")) {
+            fileName = "stage5.txt";
+        } else if (stageName.equals("스테이지 6")) {
+            fileName = "stage6.txt";
+        } else if (stageName.equals("스테이지 7")) {
+            fileName = "stage7.txt";
         } else {
             System.out.println("알 수 없는 스테이지: " + stageName);
             return;

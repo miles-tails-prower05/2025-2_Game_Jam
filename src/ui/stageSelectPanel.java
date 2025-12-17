@@ -18,6 +18,11 @@ public class stageSelectPanel extends JPanel {
     private JButton stage1Btn;
     private JButton stage2Btn;
     private JButton backToTitleBtn; // 타이틀로 가기 버튼 추가
+    private JButton stage3Btn;
+    private JButton stage4Btn;
+    private JButton stage5Btn;
+    private JButton stage6Btn;
+    private JButton stage7Btn;
 
     public stageSelectPanel(Container frame, CardLayout cards, GamePanel gamePanel, SaveManager saveManager) {
         this.frame = frame;
@@ -26,33 +31,39 @@ public class stageSelectPanel extends JPanel {
         this.saveManager = saveManager;
 
         setPreferredSize(new Dimension(1280, 720));
-        setLayout(new FlowLayout(FlowLayout.CENTER, 50, 300));
+        setLayout(new GridLayout(3, 3, 20, 20));
         setBackground(Color.DARK_GRAY);
+        setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100));
 
         // 버튼 생성
         stage1Btn = new JButton();
         stage2Btn = new JButton();
+        stage3Btn = new JButton();
+        stage4Btn = new JButton();
+        stage5Btn = new JButton();
+        stage6Btn = new JButton();
+        stage7Btn = new JButton();
         
-        Font btnFont = new Font("Malgun Gothic", Font.BOLD, 20);
+        Font btnFont = new Font("Malgun Gothic", Font.BOLD, 16);
         stage1Btn.setFont(btnFont);
         stage2Btn.setFont(btnFont);
-        stage1Btn.setPreferredSize(new Dimension(250, 80)); // 텍스트가 길어지므로 크기 조절
-        stage2Btn.setPreferredSize(new Dimension(250, 80));
+        stage3Btn.setFont(btnFont);
+        stage4Btn.setFont(btnFont);
+        stage5Btn.setFont(btnFont);
+        stage6Btn.setFont(btnFont);
+        stage7Btn.setFont(btnFont);
 
         // 초기 텍스트 설정
         updateButtonText();
 
-        stage1Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 1");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
-
-        stage2Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 2");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
+        // Add action listeners using helper method
+        addStageListener(stage1Btn, "스테이지 1");
+        addStageListener(stage2Btn, "스테이지 2");
+        addStageListener(stage3Btn, "스테이지 3");
+        addStageListener(stage4Btn, "스테이지 4");
+        addStageListener(stage5Btn, "스테이지 5");
+        addStageListener(stage6Btn, "스테이지 6");
+        addStageListener(stage7Btn, "스테이지 7");
         
         // 3. 타이틀로 가기 버튼 (추가된 부분)
         backToTitleBtn = new JButton("타이틀로 가기");
@@ -67,6 +78,19 @@ public class stageSelectPanel extends JPanel {
         add(stage1Btn);
         add(stage2Btn);
         add(backToTitleBtn);
+        add(stage3Btn);
+        add(stage4Btn);
+        add(stage5Btn);
+        add(stage6Btn);
+        add(stage7Btn);
+        
+        // Back button
+        JButton backBtn = new JButton("뒤로가기");
+        backBtn.setFont(btnFont);
+        backBtn.addActionListener(e -> {
+            cards.show(frame, "TITLE");
+        });
+        add(backBtn);
         
         // ★ 추가: 이 패널이 화면에 보일 때마다 기록 갱신
         this.addComponentListener(new ComponentAdapter() {
@@ -77,13 +101,32 @@ public class stageSelectPanel extends JPanel {
         });
     }
     
+    // Helper method to add stage action listener
+    private void addStageListener(JButton button, String stageName) {
+        button.addActionListener(e -> {
+            gamePanel.changeStage(stageName);
+            cards.show(frame, "GAME");
+            gamePanel.requestFocus();
+        });
+    }
+    
     // ★ 추가: 저장된 기록을 불러와 버튼 텍스트 변경
     private void updateButtonText() {
         long time1 = saveManager.getBestTime("스테이지 1");
         long time2 = saveManager.getBestTime("스테이지 2");
+        long time3 = saveManager.getBestTime("스테이지 3");
+        long time4 = saveManager.getBestTime("스테이지 4");
+        long time5 = saveManager.getBestTime("스테이지 5");
+        long time6 = saveManager.getBestTime("스테이지 6");
+        long time7 = saveManager.getBestTime("스테이지 7");
         
-        stage1Btn.setText(formatButtonText("스테이지 1", time1));
-        stage2Btn.setText(formatButtonText("스테이지 2", time2));
+        stage1Btn.setText(formatButtonText("스테이지 1: 모래사장", time1));
+        stage2Btn.setText(formatButtonText("스테이지 2: 얕은 바다", time2));
+        stage3Btn.setText(formatButtonText("스테이지 3: 난파선", time3));
+        stage4Btn.setText(formatButtonText("스테이지 4: 심해", time4));
+        stage5Btn.setText(formatButtonText("스테이지 5: 수중 미로", time5));
+        stage6Btn.setText(formatButtonText("스테이지 6: 평행 세계", time6));
+        stage7Btn.setText(formatButtonText("스테이지 7: 외딴 섬", time7));
     }
     
     // ★ HTML 태그를 사용하여 멀티라인 텍스트 만들기
