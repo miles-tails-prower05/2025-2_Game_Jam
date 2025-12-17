@@ -30,6 +30,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private JButton menuButton;
     private JPanel pausePanel;
     private JButton btnRestart, btnStageSelect, btnExitTitle, btnResume;
+    private ImageIcon charIcon;
+    private Image charIconScaled;
     
     private boolean isStoryMode = false;
     
@@ -100,6 +102,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         setBackground(new Color(0, 100, 0)); 
         setFocusable(true);
         addKeyListener(this);
+        
+        // 이미지 로드
+        try {
+            charIcon = new ImageIcon("src/stage/images/char_icon.png");
+            charIconScaled = charIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        } catch (Exception e) {
+            System.out.println("이미지 로드 실패: " + e.getMessage());
+        }
 
         mapManager = new MapManager();
         this.frame = frame;
@@ -422,10 +432,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         int lifeIconX = 20;
         int lifeIconY = 55; // 시간 텍스트 아래에 위치하도록 Y좌표를 55로 조정
         
-        g.setColor(Color.BLUE);
-        g.fillRect(lifeIconX, lifeIconY, 30, 30);
-        g.setColor(Color.BLACK); 
-        g.drawRect(lifeIconX, lifeIconY, 30, 30);
+        if (charIconScaled != null) {
+            g.drawImage(charIconScaled, lifeIconX, lifeIconY, null);
+        }
 
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 25));
