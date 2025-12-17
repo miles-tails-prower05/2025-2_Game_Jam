@@ -21,10 +21,10 @@ public class RivalCharacter {
     
     // AI parameters
     private final double moveSpeed = 10.0; // Slightly slower than player's 15.0
-    private final double jumpStrength = -11.0; // Same as player
-    private final double gravity = 0.5; // Same as stage 6
     private final int detectionRange = 150; // Pixels ahead to detect obstacles
     private final int detectionHeight = 100; // Height to check for obstacles
+    private final int groundCheckDistance = 50; // Distance ahead to check for ground
+    private final int groundCheckDepth = 100; // Depth to check below rival
     
     // AI state
     private int jumpCooldown = 0;
@@ -56,7 +56,7 @@ public class RivalCharacter {
         
         if (onGround && jumpCooldown == 0) {
             if (shouldJump(mapManager)) {
-                velocityY = jumpStrength;
+                velocityY = mapManager.getJumpStrength();
                 onGround = false;
                 jumpCooldown = jumpCooldownMax;
             }
@@ -66,7 +66,7 @@ public class RivalCharacter {
         x += velocityX;
         
         // Apply gravity
-        velocityY += gravity;
+        velocityY += mapManager.getGravity();
         y += velocityY;
         
         // Check collisions
@@ -93,10 +93,10 @@ public class RivalCharacter {
         
         // Check for holes (lack of platform ahead at ground level)
         Rectangle groundCheck = new Rectangle(
-            (int)x + width + 50,
+            (int)x + width + groundCheckDistance,
             (int)y + height,
-            50,
-            100
+            groundCheckDistance,
+            groundCheckDepth
         );
         
         boolean hasGroundAhead = false;
@@ -148,12 +148,6 @@ public class RivalCharacter {
                 } else if (velocityY < 0) { // Moving up
                     y = platform.y + platform.height;
                     velocityY = 0;
-                }
-                
-                // Horizontal collision
-                if (velocityX > 0 && x + width > platform.x && x < platform.x) {
-                    x = platform.x - width;
-                    velocityX = 0;
                 }
             }
         }

@@ -729,7 +729,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         // Reset rival character if in Stage 6
         if (rivalCharacter != null && currentStageName.equals("Rival Battle")) {
-            rivalCharacter.reset(mapManager.getSpawnX() + 100, mapManager.getSpawnY());
+            rivalCharacter.reset(mapManager.getSpawnX(), mapManager.getSpawnY());
         }
     }
 
@@ -914,8 +914,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         
         // Initialize rival character for Stage 6
         if (stage.equals("Rival Battle")) {
-            // Spawn rival slightly ahead of player
-            rivalCharacter = new RivalCharacter(mapManager.getSpawnX() + 100, mapManager.getSpawnY());
+            // Spawn rival at same starting position as player
+            rivalCharacter = new RivalCharacter(mapManager.getSpawnX(), mapManager.getSpawnY());
             isRivalDefeated = false;
             defeatMessageTimer = 0;
         } else {
