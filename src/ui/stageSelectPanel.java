@@ -55,47 +55,14 @@ public class stageSelectPanel extends JPanel {
         // 초기 텍스트 설정
         updateButtonText();
 
-        stage1Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 1");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
-
-        stage2Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 2");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
-        
-        stage3Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 3");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
-        
-        stage4Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 4");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
-        
-        stage5Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 5");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
-        
-        stage6Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 6");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
-        
-        stage7Btn.addActionListener(e -> {
-            gamePanel.changeStage("스테이지 7");
-            cards.show(frame, "GAME");
-            gamePanel.requestFocus();
-        });
+        // Add action listeners using helper method
+        addStageListener(stage1Btn, "스테이지 1");
+        addStageListener(stage2Btn, "스테이지 2");
+        addStageListener(stage3Btn, "스테이지 3");
+        addStageListener(stage4Btn, "스테이지 4");
+        addStageListener(stage5Btn, "스테이지 5");
+        addStageListener(stage6Btn, "스테이지 6");
+        addStageListener(stage7Btn, "스테이지 7");
         
         add(stage1Btn);
         add(stage2Btn);
@@ -119,6 +86,15 @@ public class stageSelectPanel extends JPanel {
             public void componentShown(ComponentEvent e) {
                 updateButtonText();
             }
+        });
+    }
+    
+    // Helper method to add stage action listener
+    private void addStageListener(JButton button, String stageName) {
+        button.addActionListener(e -> {
+            gamePanel.changeStage(stageName);
+            cards.show(frame, "GAME");
+            gamePanel.requestFocus();
         });
     }
     
