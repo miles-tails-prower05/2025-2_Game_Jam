@@ -5,6 +5,7 @@ import javax.swing.*;
 
 import data.SaveManager;
 import ui.eventScenePanel;
+import audio.AudioManager;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -50,6 +51,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private MapManager mapManager;
     
     private SaveManager saveManager;
+    
+    // --- Audio Manager ---
+    private AudioManager audioManager;
+    private boolean hasPlayedOxygenWarning = false; // 산소 경고음 중복 방지
 
     // --- 카메라 ---
     private int cameraX = 0;
@@ -118,6 +123,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         setFocusable(true);
         addKeyListener(this);
         
+        audioManager = AudioManager.getInstance();
+        
         // 이미지 로드
         try {
             charIcon = new ImageIcon("src/stage/images/char_icon.png");
@@ -166,10 +173,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 pausePanel.setVisible(false); 
                 menuButton.setVisible(true);
                 GamePanel.this.requestFocusInWindow();
+                audioManager.resumeBGM(); // Resume BGM when panel is shown
             }
             @Override
             public void componentHidden(ComponentEvent e) {
                 if (timer != null) timer.stop();
+                audioManager.pauseBGM(); // Pause BGM when panel is hidden
             }
         });
     }
@@ -209,6 +218,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         btnExitTitle.setFont(font);
         btnExitTitle.setFocusable(false);
         btnExitTitle.addActionListener(e -> {
+        	audioManager.stopBGM(); // Stop BGM when exiting to title
             cards.show(frame, "TITLE");
         });
 
@@ -225,6 +235,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             timer.stop(); 
         }
         
+        audioManager.pauseBGM(); // Pause BGM when menu is shown
+        
         btnStageSelect.setEnabled(!isStoryMode);
         
         if (currentLives <= 1) {
@@ -240,6 +252,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private void resumeGame() {
         pausePanel.setVisible(false);
         menuButton.setVisible(true);
+        audioManager.resumeBGM(); // Resume BGM when menu is hidden
         if (!timer.isRunning()) {
             timer.start();
         }
@@ -459,10 +472,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     	
         if (isDead) {
             g.setColor(Color.WHITE);
-            g.setFont(new Font("Arial", Font.BOLD, 40));
-            g.drawString("GAME OVER", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2);
-            g.setFont(new Font("Arial", Font.PLAIN, 20));
-            g.drawString("Press SPACE or W to Restart", WINDOW_WIDTH/2 - 120, WINDOW_HEIGHT/2 + 50);
+            g.setFont(new Font("Malgun Gothic", Font.BOLD, 40));
+            g.drawString("게임 오버", WINDOW_WIDTH/2 - 100, WINDOW_HEIGHT/2);
+            g.setFont(new Font("Malgun Gothic", Font.PLAIN, 20));
+            g.drawString("스페이스 바를 눌러 다시 시작하세요.", WINDOW_WIDTH/2 - 120, WINDOW_HEIGHT/2 + 50);
             return;
         }
         
@@ -594,6 +607,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                     	eventPanel.startCutscene("ending_script.txt", "TITLE");
                     }
                 } else {
+                	audioManager.stopBGM(); // Stop BGM when returning to stage select
                     cards.show(frame, "SELECT");
                 }
             }
@@ -604,6 +618,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         if (mapManager.isUnderwater()) {
             currentOxygen--; 
+            
+            // 산소 경고음 재생 (30% 이하일 때)
+            float oxygenRatio = (float) currentOxygen / maxOxygen;
+            if (oxygenRatio <= 0.3f && oxygenRatio > 0.0f && !hasPlayedOxygenWarning) {
+                audioManager.playSFX("oxygen_warning");
+                hasPlayedOxygenWarning = true;
+            }
             
             if (currentOxygen <= 0) {
                 handleDeath(); 
@@ -626,10 +647,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                 Bubble b = it.next();
                 b.move();
                 if (playerRect.intersects(b.getBounds())) {
+                	audioManager.playSFX("bubble_collect");
                     currentOxygen = maxOxygen;
                     it.remove(); 
                 } else if (b.y < -50) it.remove();
             }
+        } else {
+            currentOxygen = maxOxygen; 
+            hasPlayedOxygenWarning = false; // Reset warning flag when out of water
         }
 
         if (leftPressed) velocityX = -mapManager.getSpeed();
@@ -640,6 +665,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             velocityY = mapManager.getJumpStrength(); 
             onGround = false; 
             jumpLocked = true; 
+            audioManager.playSFX("jump"); // Play jump sound effect
         }
 
         playerX += velocityX;
@@ -733,9 +759,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private void handleDeath() {
         currentLives--; 
         if (currentLives > 0) {
+        	audioManager.playSFX("death");
             respawn(); 
         } else {
             isDead = true; 
+            audioManager.stopBGM(); // Stop BGM on game over
+            audioManager.playSFX("death");
         }
     }
 
@@ -746,6 +775,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         velocityY = 0;
         cameraX = 0; // 스테이지 시작 시 카메라 위치도 즉시 초기화
         currentOxygen = maxOxygen; 
+        hasPlayedOxygenWarning = false; // Reset warning flag on respawn
         
         // Reset breakable platforms on respawn
         mapManager.resetBreakablePlatforms();
@@ -796,7 +826,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
                         playerY = platform.y - playerHeight;
                         velocityY = 0;
                         onGround = true;
-                        bp.trigger(); // Trigger the platform to break
+                        if (! bp.isTriggered()) {
+                            bp.trigger();
+                            audioManager.playSFX("platform_break"); // 부서지는 소리 재생
+                        }
                     } else if (velocityY < 0) { 
                         playerY = platform.y + platform.height;
                         velocityY = 0;
@@ -838,6 +871,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         if (goal != null && playerRect.intersects(goal)) {
             if (!isCleared) {
                 isCleared = true;
+                audioManager.playSFX("piece_collect");
                 clearDelayTimer = 0;
                 
                 // ★ 추가: 클리어 시 기록 저장
@@ -932,6 +966,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         clearDelayTimer = 0;
         
         if (activeBubbles != null) activeBubbles.clear();
+        
+        audioManager.playBGM(stage);
 
         if (mapManager.isUnderwater()) setBackground(new Color(0, 100, 0)); 
         else setBackground(new Color(135, 206, 235));
